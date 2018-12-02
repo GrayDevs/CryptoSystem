@@ -42,41 +42,57 @@ def choixlgHash():
     return taillehash
 
 
-def convBin():
-    fichier = open("test.txt", "r", encoding="ISO-8859-1").read()
-    fichierbinaire = ''.join(format(ord(x), 'b') for x in fichier)
+def ofichier():
+
+    fichier = input ("Entrez un fichier :")
+    i = 0
+    while i == 0:
+        try:
+            with open(fichier):
+                i = 1
+        except IOError:
+            fichier = input("Erreur, entrez un vrai fichier :")
+
+    return fichier
+
+
+def convBin(fichier):
+
+    fic = open(fichier, "r", encoding="ISO-8859-1").read()
+    fichierbinaire = ''.join(format(ord(x), 'b') for x in fic)
 
     return fichierbinaire
 
+def padding(fichierBinaire,r):
 
-def padding(fichierBinaire, r):
     "padding multiple de r"
 
     if (len(fichierBinaire) != r):
-        messagePadding = ("0" * (r - (len(fichierBinaire)) % r)) + fichierBinaire
-    else:
-        messagePadding = fichierBinaire
+        messagePadding = ("0" * (r - (len(fichierBinaire)) % r )) + fichierBinaire
+    else : messagePadding = fichierBinaire
 
     return messagePadding
 
-
-def hash(messagePadding, r, c, taillebloc):
+def hash(messagePadding,r,c,taillebloc):
     "EN COURS "
     B0 = "0" * taillebloc
     NombreIter = 24
 
-
 def main():
+
     print("------Hashage sha-3----------")
-    lgHash = choixlgHash()
-    print("Vous avez choisis " + lgHash + " bits.")
-    r, c, taillebloc = bloc(lgHash)
-    fichierBinaire = convBin()
-    messagePadding = padding(fichierBinaire, r)
-    print("---------PADDING-----------")
+    fichier = ofichier()
+    lgHash=choixlgHash()
+    print("Vous avez choisis " + lgHash +" bits.")
+    r,c,taillebloc=bloc(lgHash)
+    fichierBinaire=convBin(fichier)
+    messagePadding=padding(fichierBinaire,r)
+    print ("---------PADDING-----------")
     print("---------Initialisation-----------")
-    hashage = hash(messagePadding, r, c, taillebloc)
+    hashage=hash(messagePadding,r,c,taillebloc)
+
 
 
 if __name__ == '__main__':
-    main()
+     main()
+
