@@ -11,7 +11,7 @@ RFCs :
 import secrets
 import math
 from time import process_time
-from GS15.DH import utils
+from core import utils
 
 
 #########################
