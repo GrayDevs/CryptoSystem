@@ -735,19 +735,19 @@ long_prime_test_vector = [10007, 10009, 10037, 10039, 10061, 10067, 10069, 10079
 
 
 def main():
-    from GS15.DH.utils import rabin_miller, miller_rabin_primality_test
+    from CryptoSystem.core import utils
     from time import process_time
 
     t = process_time()
     for prime in long_prime_test_vector:
-        rabmil = rabin_miller(prime, 2)
+        rabmil = utils.rabin_miller(prime, 2)
         assert rabmil is True
 
     print("wikipedia version :", process_time()-t)
 
     t = process_time()
     for prime in long_prime_test_vector:
-        rabmil = miller_rabin_primality_test(prime)
+        rabmil = utils.miller_rabin_primality_test(prime)
         assert rabmil is True
 
     print("wolfram alpha version :", process_time()-t)

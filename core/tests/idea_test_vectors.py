@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+# -*- coding: utf-8 -*-
 
 # Test vectors obtained from :
 # https://www.cosic.esat.kuleuven.be/nessie/testvectors/bc/idea/Idea-128-64.verified.test-vectors
@@ -3609,7 +3610,7 @@ TEST_VECTORS = (
 
 
 def main():
-    from GS15.idea import IDEA
+    from CryptoSystem.core.idea import IDEA
     my_cipher = IDEA(0)
 
     for test in TEST_VECTORS:
