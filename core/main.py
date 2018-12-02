@@ -7,10 +7,15 @@
 import argparse
 import sys
 
+import core.diffie_hellman
+
 # Output should be colored
 colors = True
 # Detecting the OS of current system
 machine = sys.platform
+if machine.lower().startswith(('os', 'win', 'darwin', 'ios')):
+    # Colors shouldn't be displayed on macOS and Windows
+    colors = False
 if not colors:
     end = red = white = green = yellow = run = bad = good = info = que = ''
 else:
@@ -23,7 +28,7 @@ else:
     bad = '\033[1;31m[-]\033[1;m'
     good = '\033[1;32m[+]\033[1;m'
     info = '\033[1;33m[!]\033[1;m'
-que = '\033[1;34m[?]\033[1;m'
+    que = '\033[1;34m[?]\033[1;m'
 
 # Banner
 print('''
@@ -40,7 +45,40 @@ Y88b  d88P Y88b  d88P   888  Y88b  d88P
 # Processing command line arguments
 parser = argparse.ArgumentParser()
 # Options
-# ...
 parser.add_argument('-v', '--verbose', help='verbose output', dest='verbose', action='store_true')
+# ...
 args = parser.parse_args()
 
+# Menu
+menu = {}
+menu['[1]'] = "Generate keys"
+menu['[2]'] = "Authenticate a public key / certificate"
+menu['[3]'] = "Sharing a secrete key"
+menu['[4]'] = "Encrypt a message / file (and sign it)"
+menu['[5]'] = "Decrypt a message and verify its signature"
+menu['[6]'] = "FULL"
+menu['[7]'] = "Exit"
+while True:
+    options = menu.keys()
+    for entry in options:
+        print(entry, menu[entry])
+
+    selection = input("> ")
+    if selection == '1':
+        core.diffie_hellman.dh_main()
+    elif selection == '2':
+        print("find")
+    elif selection == '3':
+        print("find")
+    elif selection == '4':
+        print("find")
+    elif selection == '5':
+        print("find")
+    elif selection == '6':
+        print("find")
+    elif selection == '7':
+        break
+    else:
+        print("Unknown Option Selected!\n")
+
+print('\n# Exit...')
