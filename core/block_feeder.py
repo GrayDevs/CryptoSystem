@@ -1,17 +1,15 @@
 # -*-coding:UTF-8 -*
 # !/usr/bin/env python
 
-""" This module do things
-
-"""
+""" This module do things """
 
 import binascii
-
-from GS15.IDEA.idea import IDEA
+from core.idea import IDEA
 
 
 def generate_test_file():
     pass
+
 
 #########################
 #                       #
@@ -19,8 +17,7 @@ def generate_test_file():
 #                       #
 #########################
 
-
-def get_file_hex(file_name='test.txt'):
+def get_file_hex(file_name='tests/idea_test.txt'):
     """ ...
     :return: fileHex: <bytes>
     """
@@ -49,7 +46,7 @@ def generate_block():
     hex_blocks = []
     num_blocks = ceil_div(len_hex, 16)
     for i in range(num_blocks):
-        to_int = int(file_hex[i*16:16+i*16], 16) # THIS CAN GENERATE ERROR
+        to_int = int(file_hex[i * 16:16 + i * 16], 16)  # THIS CAN GENERATE ERROR
         hex_blocks.append(to_int)
         # print(hex(hex_blocks[i])[2:])
     assert num_blocks == len(hex_blocks)
@@ -57,18 +54,19 @@ def generate_block():
     return hex_blocks
 
 
-def encryption_feed(key, blocks, output_file='Output.txt'):
+def encryption_feed(key, blocks, output_file='tests/Output.txt'):
     # erase file content if it already exists
     with open(output_file, encoding='utf-8', mode='w') as file:
-            file.write("")
+        file.write("")
 
     my_IDEA = IDEA(key, 128)
 
     for i in range(len(blocks)):
         encrypted = my_IDEA.encrypt(blocks[i])
-        encrypted = hex(encrypted)[2:].zfill(16) # formatage
-        with open('Output.txt', mode='a') as file:
+        encrypted = hex(encrypted)[2:].zfill(16)  # formatage
+        with open(output_file, mode='a') as file:
             file.write(encrypted)
+
 
 # Test
 if __name__ == '__main__':
@@ -76,8 +74,8 @@ if __name__ == '__main__':
 
     # encryption
     blocks = generate_block()  # extraction + padding + spliting in multiple blocks
-    encryption_feed(key, blocks)
-    with open('Output.txt', 'r') as file_alias:
+    # encryption_feed(key, blocks)
+    with open('tests/Output.txt', 'r') as file_alias:
         enc_file_hex = file_alias.read()
 
     # decryption
@@ -86,7 +84,7 @@ if __name__ == '__main__':
     crypt_hex_blocks = []
     num_blocks = ceil_div(len_hex, 16)
     for i in range(num_blocks):
-        to_int = int(enc_file_hex[i*16:16+i*16], 16)  # THIS CAN GENERATE ERROR
+        to_int = int(enc_file_hex[i * 16:16 + i * 16], 16)  # THIS CAN GENERATE ERROR
         crypt_hex_blocks.append(to_int)
     assert num_blocks == len(crypt_hex_blocks)
 
@@ -95,7 +93,7 @@ if __name__ == '__main__':
     my_IDEA = IDEA(key, 128)
     for i in range(len(crypt_hex_blocks)):
         decrypted = my_IDEA.decrypt(crypt_hex_blocks[i])
-        decrypted = hex(decrypted)[2:].zfill(16) # formatage
+        decrypted = hex(decrypted)[2:].zfill(16)  # formatage
         decrypted_blocks.append(decrypted)
 
     print(blocks)
@@ -112,8 +110,7 @@ if __name__ == '__main__':
 # int.from_bytes(b'\x00\x10', byteorder='little')
 
 #############################################################################################################################################
-## Naming convention  : Pythono PEP 8 ####
-#
+# Naming convention  : Python PEP 8
 # module_name, package_name
 # ClassName,
 # method_name, ExceptionName, function_name,

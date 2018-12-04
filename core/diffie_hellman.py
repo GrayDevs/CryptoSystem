@@ -109,6 +109,7 @@ def diffie_hellman(bit_len=1024, std=True):
             # q = 0x801C0D34C58D93FE997177101F80535A4738CEBCBF389A99B36371EB
     else:
         g, p = sophie_germain(bit_len)
+        print("g = {0}\np = {1}".format(g, p))
         while not ((pow(a_private, 2, p) != 1) and (pow(a_private, g, p) != 1)):
             a_private = secrets.randbelow(pow(2, 256))
 
@@ -134,14 +135,16 @@ def dh_main():
     print("\n# KEY GENERATION\n")
 
     # Menu 1 - keylen
-    dh_menu_keylen = {}
-    dh_menu_keylen['1-'] = "1024 bits"
-    dh_menu_keylen['2-'] = "2048 bits"
+    dh_menu_keylen = {
+        '1-': "1024 bits",
+        '2-': "2048 bits"
+    }
 
     # Menu 2 - Prime Generation
-    dh_menu_pgen = {}
-    dh_menu_pgen['1-'] = "Use standard (RFC)"
-    dh_menu_pgen['2-'] = "Generate strong prime (deprecated)"
+    dh_menu_pgen = {
+        '1-': "Use standard (RFC)",
+        '2-': "Generate strong prime (deprecated)"
+    }
 
     # Choices
     loop_continue = True
@@ -175,15 +178,16 @@ def dh_main():
             print("Unknown Option Selected!\n")
 
     # Check / debug
-    key = diffie_hellman(bit_len=1024, std=True)
-    print(key,"\n")
+    key = diffie_hellman(bit_len, std)
+    print(key, "\n")
 
     return 0
 
 # Local Test
 if __name__ == "__main__":
-    dh_main()
-    # key = diffie_hellman(1024, True)
-    # print(key)
+    # dh_main()
 
+    # Exemples
+    # g = 139952017708915356499530046793467332997168343092144526434864051134276187542840208827042096820911223880971669429945266950444718976481113299960305282933947246285905832006544914843243662463708326349180054093986102018528068542836967918379624072673509238694820444455384639487911069319902112546638720867693364772593
+    # p = 279904035417830712999060093586934665994336686184289052869728102268552375085680417654084193641822447761943338859890533900889437952962226599920610565867894492571811664013089829686487324927416652698360108187972204037056137085673935836759248145347018477389640888910769278975822138639804225093277441735386729545187
     pass

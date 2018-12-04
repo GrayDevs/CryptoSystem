@@ -219,7 +219,7 @@ def temoin_miller(a, n):
     return True  # a est un témoin de Miller, n est composé
 
 
-def rabin_miller(n, k=15):
+def rabin_miller(n, k=14):
     """ Test de Rabin-Miller
 
     :param n: <int> - un entier impair ≥ 3
@@ -235,7 +235,7 @@ def rabin_miller(n, k=15):
 
     # if n < 2^16 = 18,446,744,073,709,551,616, it is enough to test a=2,3,5,7,11,13,17,19,23,29,31 and 37;
     # ... @see wikipedia
-    test_list = [2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 61, 73, 1662803]  # optimization
+    test_list = [3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 61, 73, 1662803]  # optimization
     for i in range(k):
         # 'a' est choisi aléatoirement dans l'intervalle [2, n-2]
         # a = randrange(2, n - 2)
@@ -284,7 +284,7 @@ def miller_rabin_primality_test(n, k=2):
 
 # TEST ZONE
 if __name__ == "__main__":
-
+    sieve_of_eratosthenes(1000000)
     # print(fermat_primality_test(7))
     # print(rabin_miller(44600782844059322679787115580475394454610249729145792871260295110063546808692305971895255281608176659435668688076634717303552368620463427957722398118490589527180422187442349959283617691974410079937916405314415599450518488171311795228586635640346382637523377502311060484277241482917191477205629836101135468161))
 
