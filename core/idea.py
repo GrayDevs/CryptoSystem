@@ -77,7 +77,7 @@ def mul_inv(a):
     return result
 
 
-class IDEA:
+class IDEA(object):
     """
     This class is responsible for managing the encryption.
     It will generate subkeys and encrypt/decrypt the data.
@@ -242,8 +242,8 @@ class IDEA:
         return plaintext
 
 
-def main():
-    # key = 0x2BD6459F82C5B300952C49104881FF48
+if __name__ == "__main__":
+        # key = 0x2BD6459F82C5B300952C49104881FF48
     # keylen = 128
     # plain = 0xF129A6601EF62A47
     # cipher = 0xEA024714AD5C4D84
@@ -266,6 +266,4 @@ def main():
     assert decrypted == plain  # debug
     print('decrypted\t', hex(decrypted))
 
-
-if __name__ == "__main__":
-    main()
+    pass
