@@ -256,22 +256,26 @@ def fonctionHASH(BlocTab):
 
 
     "Etape 5"
-    "LFSR pas fait"
+    
     BlocEtape5 = BlocEtape4
 
     for m in range(0, 6):
         for j in range(1, 5):
-            BlocEtape5[j, j, :] = xor_binaire(BlocEtape4[j, j, (2 ^ m - 1) % 64],BlocEtape4[j, j, m + 7])
+            BlocEtape5[j, j, :] = xor_binaire(BlocEtape4[j, j, (2 ^ m - 1) % 64],BlocEtape4[j, j, m + 7 * lfsr(m)])
 
     BlocString5 = array_to_string(BlocEtape5)
     #print("Etape 5 : " + BlocString5)
 
     return BlocEtape5, BlocString5
 
+def lfsr(m):
+
+    lfsr_tab = [0,1,1,0,1,0,1,1]
+    return lfsr_tab[m]
 
 def fonctionRecuperation(HashBloc,HashString,p,r):
     " phase de recuperation"
-    "Probleme avec m, erreur dans l'énoncé ?"
+    
     m=ceil(int(r)/int(p))
     c=int(r)+int(p)
     #print("m : " + str(m))
