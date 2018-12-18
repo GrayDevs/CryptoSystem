@@ -70,6 +70,14 @@ def md5(message):
     # append original length on 64 bits to message
     message = message + str(bin(original_message_len)[2:].zfill(64))
     assert len(message) % 512 == 0
+    """
+    message = '1' + bin(message)[2:]
+    original_message_len = len(message)
+    message = message.zfill(512 * ceil(original_message_len / 512) - 64)
+    message = str(bin(original_message_len)[2:].zfill(64)) + message
+    print(message)
+    assert len(message) % 512 == 0
+    """
 
     # Process the message in successive 512-bit chunks:
     message_chunk = []

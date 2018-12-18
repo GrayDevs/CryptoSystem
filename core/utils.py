@@ -29,7 +29,47 @@ import random
 
 #########################
 #                       #
-#        UTILS          #
+#       FILE UTILS      #
+#                       #
+#########################
+
+def wipe_file(file):
+    # erase file content if it already exists
+    with open(file, encoding='utf-8', mode='w') as file_to_wipe:
+        file_to_wipe.write("")
+    return file
+
+
+def write_file(file_name, text):
+    with open(file_name, mode='wb') as file:
+        file.write(text)
+    return 0
+
+
+def check_file_exist(file):
+    try:
+        with open(file):
+            return True
+    except:
+        return False
+
+
+def get_file_hex(file_name="tests/idea_test.txt"):
+    """ Getting the content of a file
+
+    :param: file_name: <str> - file name
+    :return: content_as_bytes : <str> - content in hex
+    """
+    with open(file_name, 'rb') as file_alias:
+        content_as_bytes = file_alias.read()
+
+    hex_content = bytes.hex(content_as_bytes)
+    return hex_content
+
+
+#########################
+#                       #
+#      MATHS UTILS      #
 #                       #
 #########################
 
@@ -105,18 +145,9 @@ def exp_by_squaring_iterative(n, exp):
     return n * y
 
 
-# This don't work for large number
-def get_factors(n):
-    # Create an empty list for factors
-    factors=[];
+def ceil_div(a, b):
+    return -(-a // b)
 
-    # Loop over all factors
-    for i in range(1, n + 1):
-        if n % i == 0:
-            factors.append(i)
-
-    # Return the list of factors
-    return factors
 
 #########################
 #                       #

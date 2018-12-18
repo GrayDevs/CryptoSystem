@@ -3,115 +3,87 @@
 
 """ This module do things """
 
-import binascii
-from core.idea import IDEA
-
-
-def generate_test_file():
-    pass
-
 
 #########################
 #                       #
-#        OTHERS         #
+#       PADDING         #
 #                       #
 #########################
+from core import utils
 
-def get_file_hex(file_name='tests/idea_test.txt'):
-    """ ...
-    :return: fileHex: <bytes>
+
+def PKCS7_padding(hex_message):
+    """ Padding PKCS#7
+    k - (input_len mod k) octets all having value k - (input_len mod k)
+
+    :param: hex_message: <str> - hexadecimal message
+    :return: hex_message: <str> - padded hexadecimal message
     """
-    with open(file_name, 'rb') as file_alias:
-        content = file_alias.read()
-    # file_hex = binascii.hexlify(content)  # bytes
-    file_hex = content.hex()
+    len_message = len(hex_message)
 
-    return file_hex
+    for i in range(16 - (len_message % 16)):
+        hex_message += format(16 - (len_message % 16), 'x')
 
-
-def ceil_div(a, b):
-    return -(-a // b)
+    assert len(hex_message) % 16 == 0  # Checking if padding is successful
+    return hex_message
 
 
-def generate_block():
-    file_hex = get_file_hex()
-    len_hex = len(file_hex)
+def PKCS7_unpadding(hex_message):
+    """ Unpadding PKCS#7
+    k - (input_len mod k) octets all having value k - (input_len mod k)
 
-    # Padding PKCS#7
-    # k - (input_len mod k) octets all having value k - (input_len mod k)
-    for i in range(16 - (len_hex % 16)):
-        file_hex += format(16 - (len_hex % 16), 'x')
+    :param: hex_message: <str> - padded hexadecimal message
+    :return: unpadded_message: <str> -  unpadded hexadecimal message
+    """
+    # Getting last character of the chain
+    k = hex_message[-1]
 
-    # Dividing file hex
-    hex_blocks = []
-    num_blocks = ceil_div(len_hex, 16)
-    for i in range(num_blocks):
-        to_int = int(file_hex[i * 16:16 + i * 16], 16)  # THIS CAN GENERATE ERROR
-        hex_blocks.append(to_int)
-        # print(hex(hex_blocks[i])[2:])
-    assert num_blocks == len(hex_blocks)
+    # Converting it to int
+    try:
+        k = int(k ,16)
+    except:
+        print("Conversion Error during the un-padding operation")
 
-    return hex_blocks
+    # Removing the pad
+    unpadded_message = hex_message[:len(hex_message) - k]
+
+    return unpadded_message
 
 
-def encryption_feed(key, blocks, output_file='tests/Output.txt'):
-    # erase file content if it already exists
-    with open(output_file, encoding='utf-8', mode='w') as file:
-        file.write("")
+#########################
+#                       #
+#    BLOCK GENERATOR    #
+#                       #
+#########################
 
-    my_IDEA = IDEA(key, 128)
+def generate_blocks(hex_message):
+    """ Dividing a hex message into multiple blocks and convert those into integer
 
-    for i in range(len(blocks)):
-        encrypted = my_IDEA.encrypt(blocks[i])
-        encrypted = hex(encrypted)[2:].zfill(16)  # formatage
-        with open(output_file, mode='a') as file:
-            file.write(encrypted)
+    :param hex_message: <str> - string of hexadecimal data (needs to be padded)
+    :return: blocks: <list> - usable values for idea, ...
+    """
+    assert len(hex_message) % 16 == 0
+    blocks = []
+    for i in range(len(hex_message) // 16):
+        to_int = int(hex_message[i * 16:16 + i * 16], 16)  # Risky move here
+        blocks.append(to_int)
+
+    return blocks
 
 
 # Test
 if __name__ == '__main__':
-    key = 0x5a14fb3e021c79e0608146a0117bff03
-
-    # encryption
-    blocks = generate_block()  # extraction + padding + spliting in multiple blocks
-    # encryption_feed(key, blocks)
-    with open('tests/Output.txt', 'r') as file_alias:
-        enc_file_hex = file_alias.read()
-
-    # decryption
-    # Dividing file into multiple 16octet parts
-    len_hex = len(enc_file_hex)
-    crypt_hex_blocks = []
-    num_blocks = ceil_div(len_hex, 16)
-    for i in range(num_blocks):
-        to_int = int(enc_file_hex[i * 16:16 + i * 16], 16)  # THIS CAN GENERATE ERROR
-        crypt_hex_blocks.append(to_int)
-    assert num_blocks == len(crypt_hex_blocks)
-
-    # pure decryption
-    decrypted_blocks = []
-    my_IDEA = IDEA(key, 128)
-    for i in range(len(crypt_hex_blocks)):
-        decrypted = my_IDEA.decrypt(crypt_hex_blocks[i])
-        decrypted = hex(decrypted)[2:].zfill(16)  # formatage
-        decrypted_blocks.append(decrypted)
-
-    print(blocks)
-    print(decrypted_blocks)
-
-    # unpadding
-
-    # encoding it to UTF-8 and write into file
+    hex_message = utils.get_file_hex('tests/idea_test.txt')   # Getting the Hex
+    pad = PKCS7_padding(hex_message)                          # Padding
+    blocks = generate_blocks(pad)                             # Generating Blocks
 
     pass
+
+#content_as_int = int.from_bytes(content_as_bytes, 'little')  # to little endians
+#bin_content = bin(content_as_int)[2:]
+
+# print(content.decode('utf-8'))
 
 # int.from_bytes( bytes, byteorder, *, signed=False )
 # fileString = fileHex.decode("UTF-8")
 # int.from_bytes(b'\x00\x10', byteorder='little')
-
-#############################################################################################################################################
-# Naming convention  : Python PEP 8
-# module_name, package_name
-# ClassName,
-# method_name, ExceptionName, function_name,
-# GLOBAL_CONSTANT_NAME, CLASS_CONSTANT_NAME, global_var_name, instance_var_name, function_parameter_name, local_var_name

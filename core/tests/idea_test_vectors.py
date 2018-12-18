@@ -3610,7 +3610,7 @@ TEST_VECTORS = (
 
 
 def main():
-    from CryptoSystem.core.idea import IDEA
+    from core.idea import IDEA
     my_cipher = IDEA(0)
 
     for test in TEST_VECTORS:

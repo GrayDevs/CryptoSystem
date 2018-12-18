@@ -22,6 +22,8 @@
     @see: https://csrc.nist.gov/publications/detail/sp/800-38a/final
 """
 
+from core import block_feeder, utils
+
 
 def addition(a, b):
     """ Addition modulo 2^16
@@ -242,28 +244,116 @@ class IDEA(object):
         return plaintext
 
 
-if __name__ == "__main__":
-        # key = 0x2BD6459F82C5B300952C49104881FF48
-    # keylen = 128
-    # plain = 0xF129A6601EF62A47
-    # cipher = 0xEA024714AD5C4D84
+#########################
+#                       #
+#     MAIN FUNCTIONS    #
+#                       #
+#########################
 
+def idea_main_encryption():
+    """ print menu / get input / launch Diffie-Hellman """
+    # Menu 1 - keylen
+    idea_menu_keylen = {
+        '1-': "128 bits",
+        '2-': "256 bits"
+    }
+    # Menu 2 - ModeofEncryption
+    idea_menu_modOfEncryption = {
+        '1-': "ECB",
+        '2-': "CBC",
+        '3-': "PCBC"
+    }
+    # Choices
+    loop_continue = True
+    while loop_continue:
+        options = idea_menu_keylen.keys()
+        print("Choose Keylen (bits)")
+        for entry in options:
+            print(entry, idea_menu_keylen[entry])
+
+        selection = input("> ")
+        if selection == '1':
+            key_len, loop_continue = 128, False
+        elif selection == '2':
+            key_len, loop_continue = 256, False
+        else:
+            print("Invalid Option, please retry\n")
+    loop_continue = True
+    while loop_continue:
+        options = idea_menu_modOfEncryption.keys()
+        print("Choose Keylen (bits)")
+        for entry in options:
+            print(entry, idea_menu_modOfEncryption[entry])
+
+        selection = input("> ")
+        if selection == '1':
+            mod_of_encryption, loop_continue = 'ECB', False
+        elif selection == '2':
+            mod_of_encryption, loop_continue = 'CBC', False
+        elif selection == '3':
+            mod_of_encryption, loop_continue = 'PCBC', False
+        else:
+            print("Invalid Option, please retry\n")
+
+    file = input("Choosing file to encrypt: ")# file = utils.file_exist
+    output_file = file.split(".", 1)[0] + '.cypher'
+    utils.wipe_file(output_file)
+
+    print("----------------------GATHERING---------------------")
+    hex_message = utils.get_file_hex(file)        # Getting the Hex
+    pad = block_feeder.PKCS7_padding(hex_message)        # Padding
+    file_blocks = block_feeder.generate_blocks(pad)      # Generating Blocks
+
+    print("------------------Generating the key------------------")
     key = 0x5a14fb3e021c79e0608146a0117bff03
-    keylen = 128
-    plain = 0xF129A6601EF62A47
-    cipher = 0xaa31cc614e0faa30
+    print("KEY = ", key)
 
-    print('key\t\t', hex(key))
-    print('plaintext\t', hex(plain))
+    print("---------------------ENCRYPTION----------------------")
+    my_IDEA = IDEA(key, 128)
+    output = ''
+    for i in range(len(file_blocks)):
+        encrypted = my_IDEA.encrypt(file_blocks[i])
+        output += hex(encrypted)[2:].zfill(16)
 
-    my_IDEA = IDEA(key, keylen)  # creation de l'objet my_IDEA de type IDEA
-    encrypted = my_IDEA.encrypt(plain)
+    with open(output_file, mode='a') as file:
+        file.write(output)
 
-    assert encrypted == cipher  # debug
-    print('encrypted\t', hex(encrypted))
+    return 0
 
-    decrypted = my_IDEA.decrypt(cipher)
-    assert decrypted == plain  # debug
-    print('decrypted\t', hex(decrypted))
+
+def idea_main_decryption():
+    file = input("File to decrypt:")
+
+    print("Password")
+    key = 0x5a14fb3e021c79e0608146a0117bff03 # key = input("> ")
+    my_IDEA = IDEA(key, 128)
+
+    print("----------------------GATHERING----------------------")
+    hex_message = utils.get_file_hex(file)
+    true_hex_message = bytes.decode(bytes.fromhex(hex_message))     # one more decoding step due to how the file is open ('rb')
+    file_blocks = block_feeder.generate_blocks(true_hex_message)
+
+    print("---------------------DECRYPTION----------------------")
+    decrypted_blocks = []
+    for i in range(len(file_blocks)):
+        decrypted = my_IDEA.decrypt(file_blocks[i])
+        decrypted = hex(decrypted)[2:].zfill(16)  # keeping the right format
+        decrypted_blocks.append(decrypted)
+
+    merged_blocks = ''.join(decrypted_blocks)
+    unpadded = block_feeder.PKCS7_unpadding(merged_blocks)
+    unpadded_to_bytes = bytes.fromhex(unpadded)
+
+    print("----------------SAVING DECRYPTED TEXT----------------")
+    new_file = input("Enter a file name: ")
+    utils.write_file(new_file, unpadded_to_bytes)
+
+    return 0
+
+# TEST ZONE
+if __name__ == "__main__":
+
+    idea_main_encryption()
+    idea_main_decryption()
 
     pass
