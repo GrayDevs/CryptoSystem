@@ -1,14 +1,26 @@
 # -*-coding:UTF-8 -*
 # !/usr/bin/env python
 
-""" Simple prime number tool-box
-# Certain de ces algorithmes sont des implémentations de pseudo-codes disponible sur Wikipédia
+""" Project tool-box
+NB: Some of those algorithms are Pythonic implementation of pseudo-codes available on Wikipedia
 
-# UTILS
+~~~ SUMMARY ~~~
+
+# FILE UTILS
+# wipe_file
+# write_file
+# check_file_exist
+# get_file_hex
+
+# MATHS UTILS
 # gcd
+# gcd_recursive
 # lcm
 # exp_by_squaring_recursive
 # exp_by_squaring_iterative
+# ceil_div
+# xgcd
+# mod_inv
 
 # SIEVES :
 # sieve_of_eratosthenes
@@ -20,10 +32,14 @@
 # fermat_primality_test
 # Solovay-Strassen
 # Rabin-Miller  # https://fr.wikipedia.org/wiki/Test_de_primalit%C3%A9_de_Miller-Rabin
+# (Ulam spiral)
 
-# (Spirale d'Ulam)
+# PRIME GENERATOR
+# prime_gen
 """
 
+import secrets
+from time import process_time
 import random
 
 
@@ -83,8 +99,15 @@ def gcd(a, b):
     :return a : <int> - the gcd of a and b
     """
     while b != 0:
-        (a, b) = (b, a % b)
+        a, b = b, (a % b)
     return a
+
+
+def gcd_recursive(a, b):
+    if b == 0:
+        return a
+    else:
+        return gcd_recursive(b, a % b)
 
 
 def lcm(a, b):
@@ -94,7 +117,7 @@ def lcm(a, b):
     :param b: <int>
     :return: <int> - the lcm of a and b
     """
-    return (a*b) // gcd(a, b)
+    return (a * b) // gcd(a, b)
 
 
 def exp_by_squaring_recursive(n, exp):
@@ -115,7 +138,7 @@ def exp_by_squaring_recursive(n, exp):
     elif n % 2 == 0:
         return exp_by_squaring_recursive(x * x, n / 2)
     elif n % 2 != 0:
-        return x * exp_by_squaring_recursive(x * x, (n-1) / 2)
+        return x * exp_by_squaring_recursive(x * x, (n - 1) / 2)
 
 
 def exp_by_squaring_iterative(n, exp):
@@ -140,7 +163,7 @@ def exp_by_squaring_iterative(n, exp):
         else:
             y = n * y
             n = n * n
-            exp = (exp-1) / 2
+            exp = (exp - 1) / 2
 
     return n * y
 
@@ -148,6 +171,35 @@ def exp_by_squaring_iterative(n, exp):
 def ceil_div(a, b):
     return -(-a // b)
 
+
+def xgcd(a, b):
+    """ Extended Euclidean Algorithm
+    :param a: <int>
+    :param b: <int>
+    :return: k: <int>, a: <int>,  prev_x: <int>, prev_x: <int>
+    """
+    k, q = 0, 0
+    prev_x, x = 1, 0
+    prev_y, y = 0, 1
+    while b:
+        q = a // b
+        x, prev_x = (q * x + prev_x), x
+        y, prev_y = (q * y + prev_y), y
+        a, b = b, a % b
+        k += 1
+        # print("k={0}\t a={1}\t  b={2}\t  q={3}\t x={4}\t  y={5}".format(k+1, a, b, q, x, y))
+
+    return k, a, prev_x, prev_y
+
+
+def mod_inv(a, b):
+    """ Calculate the modular inverse
+    :param a: <int>
+    :param b: <int>
+    :return: <int> - a^(-1) [b]
+    """
+    k, a, x, y = xgcd(a, b)
+    return (pow(-1, k) * x) % b
 
 #########################
 #                       #
@@ -231,7 +283,7 @@ def temoin_miller(a, n):
     """
     # Calculer s et d tels que n - 1 = 2^(s)×d avec d impair  s > 0 car n impair
     s = 0
-    d = n-1
+    d = n - 1
     while s % 2 == 0:
         s += 1
         d //= 2  # floor
@@ -313,10 +365,27 @@ def miller_rabin_primality_test(n, k=2):
     return True
 
 
+#########################
+#                       #
+#    PRIME GENERATOR    #
+#                       #
+#########################
+
+def prime_gen(bit_len=1024):
+    t = process_time()
+    probably_prime = 0
+    while not rabin_miller(probably_prime):
+        probably_prime = secrets.randbits(bit_len)
+
+    print("Prime successfully generated in", process_time() - t)
+    return probably_prime
+
+
 # TEST ZONE
 if __name__ == "__main__":
-    sieve_of_eratosthenes(1000000)
+    # sieve_of_eratosthenes(1000000)
     # print(fermat_primality_test(7))
     # print(rabin_miller(44600782844059322679787115580475394454610249729145792871260295110063546808692305971895255281608176659435668688076634717303552368620463427957722398118490589527180422187442349959283617691974410079937916405314415599450518488171311795228586635640346382637523377502311060484277241482917191477205629836101135468161))
-
+    print(mod_inv(13, 7))
+    print(mod_inv(23, 120))
     pass

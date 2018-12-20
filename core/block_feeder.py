@@ -3,14 +3,14 @@
 
 """ This module do things """
 
+from core import utils
+
 
 #########################
 #                       #
 #       PADDING         #
 #                       #
 #########################
-from core import utils
-
 
 def PKCS7_padding(hex_message):
     """ Padding PKCS#7
@@ -32,8 +32,8 @@ def PKCS7_unpadding(hex_message):
     """ Unpadding PKCS#7
     k - (input_len mod k) octets all having value k - (input_len mod k)
 
-    :param: hex_message: <str> - padded hexadecimal message
-    :return: unpadded_message: <str> -  unpadded hexadecimal message
+    :param hex_message: <str> - padded hexadecimal message
+    :return: <str> -  unpadded hexadecimal message
     """
     # Getting last character of the chain
     k = hex_message[-1]
@@ -45,9 +45,7 @@ def PKCS7_unpadding(hex_message):
         print("Conversion Error during the un-padding operation")
 
     # Removing the pad
-    unpadded_message = hex_message[:len(hex_message) - k]
-
-    return unpadded_message
+    return hex_message[:len(hex_message) - k]
 
 
 #########################

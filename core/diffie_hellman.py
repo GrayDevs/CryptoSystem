@@ -10,24 +10,10 @@ RFCs :
 
 import secrets
 import math
-from time import process_time
 from core import utils
 
 
-#########################
-#                       #
-#    PRIME GENERATOR    #
-#                       #
-#########################
 
-def prime_gen(bit_len=1024):
-    t = process_time()
-    probably_prime = 0
-    while not utils.rabin_miller(probably_prime):
-        probably_prime = secrets.randbits(bit_len)
-
-    print("Prime successfully generated in", process_time() - t)
-    return probably_prime
 
 
 #########################
@@ -60,11 +46,11 @@ def sophie_germain(bit_len):
     """
     q, p = 0, 0
     while not utils.rabin_miller(p):
-        q = prime_gen(bit_len)
+        q = utils.prime_gen(bit_len)
         p = 2*q + 1
 
     print("Strong prime generated")
-    return q, p
+    return p, q
 
 
 #########################
@@ -91,12 +77,8 @@ def diffie_hellman(bit_len=1024, std=True):
     :return: a_key: <int>
     """
 
-    # Generating private information
-    a_private = secrets.randbelow(pow(2, 256))
-    b_private = secrets.randbelow(pow(2, 256))
-
     # Getting p and g
-    p, g = 0, 0 # just to reference them before assignment (Warning)
+    p, q, g = 0, 0, 0 # just to reference them before assignment (Warning)
     if std:
         if bit_len == 1024:  # 160-bit prime order subgroup
             #  https://tools.ietf.org/html/rfc5114#section-2.1
@@ -108,10 +90,14 @@ def diffie_hellman(bit_len=1024, std=True):
             g = 0xAC4032EF4F2D9AE39DF30B5C8FFDAC506CDEBE7B89998CAF74866A08CFE4FFE3A6824A4E10B9A6F0DD921F01A70C4AFAAB739D7700C29F52C57DB17C620A8652BE5E9001A8D66AD7C17669101999024AF4D027275AC1348BB8A762D0521BC98AE247150422EA1ED409939D54DA7460CDB5F6C6B250717CBEF180EB34118E98D119529A45D6F834566E3025E316A330EFBB77A86F0C1AB15B051AE3D428C8F8ACB70A8137150B8EEB10E183EDD19963DDD9E263E4770589EF6AA21E7F5F2FF381B539CCE3409D13CD566AFBB48D6C019181E1BCFE94B30269EDFE72FE9B6AA4BD7B5A0F1C71CFFF4C19C418E1F6EC017981BC087F2A7065B384B890D3191F2BFA
             # q = 0x801C0D34C58D93FE997177101F80535A4738CEBCBF389A99B36371EB
     else:
-        g, p = sophie_germain(bit_len)
-        print("g = {0}\np = {1}".format(g, p))
-        while not ((pow(a_private, 2, p) != 1) and (pow(a_private, g, p) != 1)):
-            a_private = secrets.randbelow(pow(2, 256))
+        p, q = sophie_germain(bit_len)
+        print("p = {0}\nq = {1}".format(p, q))
+        while not ((pow(g, 2, p) != 1) and (pow(g, q, p) != 1)) and g != 0:
+            g = secrets.randbelow(pow(2, 256))
+    print(g)
+    # Generating private information
+    a_private = secrets.randbelow(pow(2, 256))
+    b_private = secrets.randbelow(pow(2, 256))
 
     # Calculating public value of a and b
     a_public = pow(g, a_private, p)
@@ -185,9 +171,4 @@ def dh_main():
 
 # Local Test
 if __name__ == "__main__":
-    # dh_main()
-
-    # Exemples
-    # g = 139952017708915356499530046793467332997168343092144526434864051134276187542840208827042096820911223880971669429945266950444718976481113299960305282933947246285905832006544914843243662463708326349180054093986102018528068542836967918379624072673509238694820444455384639487911069319902112546638720867693364772593
-    # p = 279904035417830712999060093586934665994336686184289052869728102268552375085680417654084193641822447761943338859890533900889437952962226599920610565867894492571811664013089829686487324927416652698360108187972204037056137085673935836759248145347018477389640888910769278975822138639804225093277441735386729545187
-    pass
+    dh_main()

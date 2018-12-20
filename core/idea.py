@@ -322,7 +322,7 @@ def idea_main_encryption():
 
 
 def idea_main_decryption():
-    file = input("File to decrypt:")
+    file = input("File to decrypt: ")
 
     print("Password")
     key = 0x5a14fb3e021c79e0608146a0117bff03 # key = input("> ")
