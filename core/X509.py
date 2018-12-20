@@ -33,7 +33,27 @@ class Certificate(object):
         certificate = (data, signature)
         return certificate
 
-if __name__ == "__main__":
 
+if __name__ == "__main__":
+    from tkinter import filedialog, Tk
+    Tk().withdraw()
+    filename = filedialog.askopenfilename()
+    print(len(filename))
+    print(filename)
+
+    """
+    # CLE PUBLIQUE ALICE : (A, g, p)
+    # Déterminer un couple de clé propre à l'UTT (U(=e,n), u)
+    
+    # Process Certificat :
+    # 1) Alice envoie sa clé publique à l'UTT
+    # 2) UTT signe A avec RSA (sa clé privé u) et obtient Su
+    # 3) UTT envoit Su à Alice
+    # 4) Alice ajoute Su à sa clé publique : (A, g, p, Su)
+    # 5) Alice envoie sa clé publique (certificat) à Bob
+    # 6) Bob demande sa clé publique à UTT
+    # 7) UTT envoie sa clé publique (U) à Bob
+    # 8) Bob déchiffre Su avec U et vérifie que le résultat soit égale à A 
+    """
 
     pass
