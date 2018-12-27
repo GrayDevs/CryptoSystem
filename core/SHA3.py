@@ -270,8 +270,12 @@ def fonctionHASH(BlocTab):
 
 def lfsr(m):
 
-    lfsr_tab = [0,1,1,0,1,0,1,1]
-    return lfsr_tab[m]
+    lfsr_tab = [0,1,1,0,1,0,1,1,0,0,0,0,0,0,0,0]
+
+    for i in range(0,7):
+        lfsr_tab[i+8] = lfsr_tab[i+3] ^ lfsr_tab[i+5]
+        #print( lfsr_tab)
+    return lfsr_tab[m+8]
 
 def fonctionRecuperation(HashBloc,HashString,p,r):
     " phase de recuperation"
