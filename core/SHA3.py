@@ -327,8 +327,6 @@ def fonctionRecuperation(HashBloc, HashString, p, r):
         else:
             Hash = str(HashString[:r]) + str(Hash)
 
-    pass
-
     # print("taille hash : " + str(len(Hash)))
     # print("Sha3-"+p+"bits ->"+HashString)
     Hash = Hash[:int(p)]
@@ -406,6 +404,23 @@ def string_to_array(string_hash):
     return block_hash
 
 
+def sha3_auto_main(fichier, lgHash=256):
+    """
+
+    :param fichier:
+    :param lgHash:
+    :return:
+    """
+    r, c, taillebloc = bloc(lgHash)
+    fichierBinaire = convBin(fichier)
+    messagePadding = padding(fichierBinaire, r)
+    HashBloc, HashString = hash(messagePadding, r, c, taillebloc, lgHash)
+    RecupHash = fonctionRecuperation(HashBloc, HashString, lgHash, r)
+    print(RecupHash)
+
+    return 0
+
+
 def sha3_main():
     """
 
@@ -429,6 +444,7 @@ def sha3_main():
     print("Hash-" + lgHash + "bits =>" + RecupHash)
     print("Taille de Hash = " + str(len(RecupHash)))
 
+    return 0
 
 if __name__ == '__main__':
     sha3_main()

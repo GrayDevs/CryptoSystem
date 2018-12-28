@@ -9,9 +9,7 @@
     > IDEA algorithm entirely avoids the use of any lookup tables or S-boxes.
 
 # Supported key sizes:
-    > 96-bit    N/A
     > 128-bit   X
-    > 160-bit   N/A
     > 256-bit   X
 
 # Supported modes of operation:
@@ -21,11 +19,13 @@
     @see: https://en.wikipedia.org/wiki/Block_cipher_mode_of_operation
     @see: https://csrc.nist.gov/publications/detail/sp/800-38a/final
 """
-import secrets
-import hashlib
 
-from tkinter import filedialog, Tk
+from secrets import randbits
+import hashlib
+import textwrap
+
 from core import block_feeder, utils
+from core.diffie_hellman import diffie_hellman
 
 
 #########################
@@ -33,8 +33,6 @@ from core import block_feeder, utils
 #       FUNCTIONS       #
 #                       #
 #########################
-from core.diffie_hellman import diffie_hellman
-
 
 def addition(a, b):
     """ Addition modulo 2^16
@@ -268,6 +266,7 @@ class IDEA(object):
 
 class IDEABlockModeOfOperation(object):
     """Mother class for IDEA modes of operation."""
+
     def __init__(self, key=0x5a14fb3e021c79e0608146a0117bff03, keylen=128):
         self._idea = IDEA(key, keylen)
 
@@ -308,17 +307,17 @@ class IDEAModeOfOperationCBC(IDEABlockModeOfOperation):
         if len(hex(iv)[2:]) != 16:
             raise ValueError("IV must be 16 Bytes long")
         else:
-            self.last_cipherblock  = iv
+            self.last_cipherblock = iv
 
         IDEABlockModeOfOperation.__init__(self, key, keylen)
 
     def encrypt(self, plaintext):
-        pre_cipherblock = (plaintext ^ self.last_cipherblock) % pow(2, 64)      # XOR IV
-        self.last_cipherblock  = self._idea.encrypt(pre_cipherblock)            # Encryption
+        pre_cipherblock = (plaintext ^ self.last_cipherblock) % pow(2, 64)  # XOR IV
+        self.last_cipherblock = self._idea.encrypt(pre_cipherblock)  # Encryption
         return self.last_cipherblock
 
     def decrypt(self, ciphertext):
-        plaintext = (self._idea.decrypt(ciphertext) ^ self.last_cipherblock) % pow(2, 64)   # Decryption, then XOR IV
+        plaintext = (self._idea.decrypt(ciphertext) ^ self.last_cipherblock) % pow(2, 64)  # Decryption, then XOR IV
         self.last_cipherblock = ciphertext
         return plaintext
 
@@ -336,19 +335,20 @@ class IDEAModeOfOperationPCBC(IDEABlockModeOfOperation):
         if len(hex(iv)[2:]) != 16:
             raise ValueError("IV must be 16 Bytes long")
         else:
-            self.last_cipherblock  = iv
+            self.last_cipherblock = iv
         IDEABlockModeOfOperation.__init__(self, key, keylen)
 
     def encrypt(self, plaintext):
-        pre_cipherblock = (plaintext ^ self.last_cipherblock) % pow(2, 64)              # XOR IV
-        ciphertext = self.last_cipherblock  = self._idea.encrypt(pre_cipherblock)       # Encryption
+        pre_cipherblock = (plaintext ^ self.last_cipherblock) % pow(2, 64)  # XOR IV
+        ciphertext = self.last_cipherblock = self._idea.encrypt(pre_cipherblock)  # Encryption
         self.last_cipherblock = plaintext ^ self.last_cipherblock
         return ciphertext
 
     def decrypt(self, ciphertext):
-        plaintext = (self._idea.decrypt(ciphertext) ^ self.last_cipherblock) % pow(2, 64)   # Decryption, then XOR IV
+        plaintext = (self._idea.decrypt(ciphertext) ^ self.last_cipherblock) % pow(2, 64)  # Decryption, then XOR IV
         self.last_cipherblock = ciphertext ^ plaintext
         return plaintext
+
 
 #########################
 #                       #
@@ -361,16 +361,15 @@ def idea_menu():
 
     :return: key_len: <int>, mod_of_encryption: <str>
     """
-
-    key_len, mod_of_encryption = 128, 'CBC'  # Setting default values
+    key_len, mod_of_operation = 128, 'CBC'  # Setting default values
 
     # Menu 1 - keylen
     idea_menu_keylen = {
         '1-': "128 bits (DH/MD5)",
         '2-': "256 bits (DH/SHA3)"
     }
-    # Menu 2 - ModeofEncryption
-    idea_menu_modOfEncryption = {
+    # Menu 2 - ModeofOperation
+    idea_menu_modOfOperation = {
         '1-': "ECB",
         '2-': "CBC",
         '3-': "PCBC"
@@ -394,90 +393,137 @@ def idea_menu():
 
     loop_continue = True
     while loop_continue:
-        options = idea_menu_modOfEncryption.keys()
-        print("Choose Mode of Encryption")
+        options = idea_menu_modOfOperation.keys()
+        print("Choose Mode of Operation")
         for entry in options:
-            print(entry, idea_menu_modOfEncryption[entry])
+            print(entry, idea_menu_modOfOperation[entry])
 
         selection = input("> ")
         if selection == '1':
-            mod_of_encryption, loop_continue = 'ECB', False
+            mod_of_operation, loop_continue = 'ECB', False
         elif selection == '2':
-            mod_of_encryption, loop_continue = 'CBC', False
+            mod_of_operation, loop_continue = 'CBC', False
         elif selection == '3':
-            mod_of_encryption, loop_continue = 'PCBC', False
+            mod_of_operation, loop_continue = 'PCBC', False
         else:
             print("Invalid Option, please retry\n")
 
-    return key_len, mod_of_encryption
+    return key_len, mod_of_operation
 
 
 def idea_main_encryption():
     """ Launch IDEA Encryption process """
 
-    print("==================IDEA ENCRYPTION==================")
-    key_len, mod_of_encryption = idea_menu()
+    print("========================================IDEA ENCRYPTION========================================")
+    key_len, mod_of_operation = idea_menu()
 
-    print("-------------------KEY GENERATION-------------------")
-    # key = 0x5a14fb3e021c79e0608146a0117bff03  # default value
+    print("----------------------------------------KEY GENERATION----------------------------------------")
     key = diffie_hellman(1024, True)  # Launch Diffie Hellman with default values
-    if(key_len == 128):
-        key = hashlib.md5(key)
-    elif(key_len == 256):
-        key = sha3()
-    print("The KEY is:", key)
+    bytes_key = key.to_bytes((key.bit_length() + 7) // 8,
+                             'little')  # key from int to bytes (compatibility with hashlib functions)
+    if key_len == 128:
+        key = int.from_bytes(hashlib.md5(bytes_key).digest(), 'little')
+    elif key_len == 256:
+        key = int.from_bytes(hashlib.sha3_256(bytes_key).digest(), 'little')
+    else:
+        raise ValueError("Wrong key length value")
+    print('\033[91mKEY:', hex(key), '\x1b[0m')
+    input("Please Consider Saving this Key... (Press any Key)")
 
-    file = input("Choosing file to encrypt: ")
-    output_file = file.split(".", 1)[0] + '.cypher'
-    utils.wipe_file(output_file)
+    print("---------------------------------------SELECTING A FILE---------------------------------------")
+    filename = utils.get_filename()
 
-    print("----------------------GATHERING---------------------")
-    hex_message = utils.get_file_hex(file)  # Getting the Hex
+    # filename = "C:/Users/antoine/Desktop/CryptoSystem/core/tests/idea_test.txt"
+    print("File to encrypt:", filename)
+    cypher_file = filename.split(".", 1)[0] + '.cypher'
+
+    print("------------------------------------GATHERING FILE CONTENT------------------------------------")
+    hex_message = utils.get_file_hex(filename)  # Getting the Hex
     pad = block_feeder.PKCS7_padding(hex_message)  # Padding
     file_blocks = block_feeder.generate_blocks(pad)  # Generating Blocks
+    print("File Blocks: {0}\n{1}\n{2}\n...".format(file_blocks[:3], file_blocks[3:7], file_blocks[7:11]))
 
+    print("------------------------------------------ENCRYPTION------------------------------------------")
+    # Managing mode of operation
+    if mod_of_operation is "ECB":
+        idea = IDEAModeOfOperationECB(key, key_len)
+    elif mod_of_operation is "CBC":
+        # iv = secrets.randbits(64)    # 16 hex long = 64 bits  # works with static iv
+        idea = IDEAModeOfOperationCBC(key, key_len)
+    elif mod_of_operation is "PCBC":
+        # iv = secrets.randbits(64)    # 16 hex long = 64 bits  # works with static iv
+        idea = IDEAModeOfOperationPCBC(key, key_len)
+    else:
+        raise ValueError("Wrong Mode of Operation.")
 
-
-    print("---------------------ENCRYPTION----------------------")
-    my_IDEA = IDEA(key, 128)
+    # Encryption (It's about time)
     output = ''
     for i in range(len(file_blocks)):
-        encrypted = my_IDEA.encrypt(file_blocks[i])
+        encrypted = idea.encrypt(file_blocks[i])
         output += hex(encrypted)[2:].zfill(16)
 
-    with open(output_file, mode='a') as file:
+    wrap = textwrap.fill(output, 94)
+    print(wrap)
+
+    print("----------------------------------CREATE ENCRYPTED FILE-----------------------------------")
+    utils.wipe_file(cypher_file)  # Clean cypher file if it already exist
+    with open(cypher_file, mode='a') as file:
         file.write(output)
+    print("\x1b[6;30;42mCypher successfully created\x1b[0m")
 
     return 0
 
 
 def idea_main_decryption():
-    file = input("File to decrypt: ")
+    """ Launch IDEA Decryption process """
 
-    print("Password")
-    key = 0x5a14fb3e021c79e0608146a0117bff03  # key = input("> ")
-    my_IDEA = IDEA(key, 128)
+    print("========================================IDEA DECRYPTION========================================")
+    key_len, mod_of_operation = idea_menu()
 
-    print("----------------------GATHERING----------------------")
-    hex_message = utils.get_file_hex(file)
+    print("---------------------------------------SELECTING A FILE---------------------------------------")
+    filename = utils.get_filename()
+    print("File to Decrypt:", filename)
+
+    print("------------------------------------GATHERING FILE CONTENT------------------------------------")
+    hex_message = utils.get_file_hex(filename)
     true_hex_message = bytes.decode(
         bytes.fromhex(hex_message))  # one more decoding step due to how the file is open ('rb')
     file_blocks = block_feeder.generate_blocks(true_hex_message)
+    print("File Blocks: {0}\n{1}\n{2}\n...".format(file_blocks[:3], file_blocks[3:7], file_blocks[7:11]))
 
-    print("---------------------DECRYPTION----------------------")
-    decrypted_blocks = []
+    print("-------------------------------------------PASSWORD-------------------------------------------")
+    print("Please type-in the Hexadecimal password given during the encryption process")
+    key = int(input("> "), 16)
+
+    print("------------------------------------------DECRYPTION------------------------------------------")
+    # Managing mode of operation
+    if mod_of_operation is "ECB":
+        idea = IDEAModeOfOperationECB(key, key_len)
+    elif mod_of_operation is "CBC":
+        # iv = secrets.randbits(64)    # 16 hex long = 64 bits  # works with static iv
+        idea = IDEAModeOfOperationCBC(key, key_len)
+    elif mod_of_operation is "PCBC":
+        # iv = secrets.randbits(64)    # 16 hex long = 64 bits  # works with static iv
+        idea = IDEAModeOfOperationPCBC(key, key_len)
+    else:
+        raise ValueError("Wrong Mode of Operation.")
+
+    # Decryption
+    output = ''
     for i in range(len(file_blocks)):
-        decrypted = my_IDEA.decrypt(file_blocks[i])
+        decrypted = idea.decrypt(file_blocks[i])
         decrypted = hex(decrypted)[2:].zfill(16)  # keeping the right format
-        decrypted_blocks.append(decrypted)
+        output += decrypted
 
-    merged_blocks = ''.join(decrypted_blocks)
-    unpadded = block_feeder.PKCS7_unpadding(merged_blocks)
+    unpadded = block_feeder.PKCS7_unpadding(output)
     unpadded_to_bytes = bytes.fromhex(unpadded)
 
-    print("----------------SAVING DECRYPTED TEXT----------------")
+    wrap = textwrap.fill(unpadded_to_bytes, 94)
+    print(wrap)
+
+    print("----------------------------------SAVING DECRYPTED TEXT-----------------------------------")
     new_file = input("Enter a file name: ")
-    utils.write_file(new_file, unpadded_to_bytes)
+    utils.write_file(new_file + ".txt", unpadded_to_bytes)
 
     return 0
 
@@ -485,56 +531,7 @@ def idea_main_decryption():
 # TEST ZONE
 if __name__ == "__main__":
     # idea_main_encryption()
-    # idea_main_decryption()
+    idea_main_decryption()
 
-    print("----------------------KEY----------------------")
-    key = 0x5a14fb3e021c79e0608146a0117bff03  # key = input("> ")
-    keylen = 128
-    print(hex(key))
-
-    print("----------------------CHOOSING A FILE----------------------")
-    """
-    Tk().withdraw()
-    filename = filedialog.askopenfilename()
-    print(len(filename))
-    """
-    filename = "C:/Users/antoine/Desktop/CryptoSystem/core/tests/idea_test.txt"
-    print(filename)
-
-    print("----------------------GATHERING----------------------")
-    hex_message = utils.get_file_hex(filename)  # Getting the Hex
-    pad = block_feeder.PKCS7_padding(hex_message)  # Padding
-    file_blocks = block_feeder.generate_blocks(pad)  # Generating Blocks
-    print(file_blocks)
-
-    print("---------------------ENCRYPTION----------------------")
-    # idea = IDEAModeOfOperationECB(key, keylen)
-    iv = secrets.randbits(64)  # 16 hex long = 64 bits
-    # idea = IDEAModeOfOperationCBC(key, keylen)
-    # enc = [idea.encrypt(int(p, 16)) for p in pad]
-    idea = IDEAModeOfOperationPCBC(key, keylen)
-    output = ''
-    for i in range(len(file_blocks)):
-        encrypted = idea.encrypt(file_blocks[i])
-        output += hex(encrypted)[2:].zfill(16)
-    print(output)
-
-    file_blocks = block_feeder.generate_blocks(output)
-    idea_decrypt = IDEAModeOfOperationPCBC(key, keylen)
-
-    print("---------------------DECRYPTION----------------------")
-    decrypted_blocks = []
-    for i in range(len(file_blocks)):
-        decrypted = idea_decrypt.decrypt(file_blocks[i])
-        decrypted = hex(decrypted)[2:].zfill(16)  # keeping the right format
-        decrypted_blocks.append(decrypted)
-
-    merged_blocks = ''.join(decrypted_blocks)
-    unpadded = block_feeder.PKCS7_unpadding(merged_blocks)
-    unpadded_to_bytes = bytes.fromhex(unpadded)
-    print(unpadded_to_bytes)
-
-    # new_file = input("Enter a file name: ")
-    # utils.write_file(new_file, unpadded_to_bytes)
-
+    # LA KLAIENT = 0x5863a453b9fd82254950770b9b7ac6b7
     pass

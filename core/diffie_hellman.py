@@ -106,7 +106,7 @@ def diffie_hellman(bit_len=1024, std=True):
     b_key = pow(a_public, b_private, p)
 
     assert a_key == b_key
-    print("\nKey successfully generated")
+    print("Key successfully generated")
 
     return a_key
 

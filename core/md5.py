@@ -9,7 +9,7 @@ Warning :
 """
 
 import hashlib
-from math import ceil  # , floor, sin
+# from math import floor, sin
 
 
 # left-rotate function definition
@@ -93,7 +93,7 @@ def md5(message):
                 F = (D & B) | ((~D) & C)  # F = (C ^ (D & (B ^ C)))
                 g = (5 * j + 1) % 16
             elif (32 <= j <= 47):
-                F = (B ^ C) ^ D
+                F = B ^ C ^ D
                 g = (3 * j + 5) % 16
             elif (48 <= j <= 63):
                 F = C ^ (B | (~D))
@@ -118,20 +118,11 @@ def md5(message):
 
 
 if __name__ == "__main__":
-
     message = 'bonjour'  # message = "Wikipedia, l'encyclopedie libre et gratuite"
     message_as_bytes = str.encode(message, 'utf-8')  # to bytes
-
     result = hashlib.md5(message_as_bytes)
-    print(result.hexdigest())
-
+    print("Hashlib Standard Result:", result.hexdigest(), type(result.hexdigest()))
     hash = md5(int.from_bytes(message_as_bytes, 'little'))
-    print(hash)
+    print("Custom MD5 Result:\t\t", hash, type(hash))
 
-    i = 68969272730655891239605054869042654276844651827212553751334886072329800586909412564471559812887552090924404880318645794717208219788400153890760005854003161593087072410255609330996402602989057233677011209171203695471405928606489699143220724585986458166708687719103387715512958241482703956516879153367779057051
-    ibis = bytes.fromhex(hex(i)[2:])
-    hash = md5(i)
-    print(hash)
-    result = hashlib.md5(ibis)
-    print(result.hexdigest())
     pass

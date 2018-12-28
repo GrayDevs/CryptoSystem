@@ -39,8 +39,9 @@ NB: Some of those algorithms are Pythonic implementation of pseudo-codes availab
 """
 
 import secrets
-from time import process_time
 import random
+from time import process_time
+from tkinter import filedialog, Tk
 
 
 #########################
@@ -50,7 +51,11 @@ import random
 #########################
 
 def wipe_file(file):
-    # erase file content if it already exists
+    """ Erase file content if it already exists
+
+    :param file: <str>
+    :return: file: <str> - wiped file
+    """
     with open(file, encoding='utf-8', mode='w') as file_to_wipe:
         file_to_wipe.write("")
     return file
@@ -62,12 +67,28 @@ def write_file(file_name, text):
     return 0
 
 
-def check_file_exist(file):
+def check_file_exist(filename):
+    """ Check if a file exists
+
+    :param filename: <str>
+    :return: <boolean>
+    """
     try:
-        with open(file):
+        with open(filename):
             return True
     except:
         return False
+
+
+def get_filename():
+    """ Open a Tkinter filedialog
+
+    :return: <str> - file path
+    """
+    root = Tk()
+    root.withdraw()
+    root.attributes("-topmost", True)
+    return filedialog.askopenfilename()
 
 
 def get_file_hex(file_name="tests/idea_test.txt"):
@@ -200,6 +221,7 @@ def mod_inv(a, b):
     """
     k, a, x, y = xgcd(a, b)
     return (pow(-1, k) * x) % b
+
 
 #########################
 #                       #
