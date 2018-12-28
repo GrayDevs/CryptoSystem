@@ -6,8 +6,7 @@
 # import
 import argparse
 import sys
-
-import core.diffie_hellman
+from core import idea, SHA3, diffie_hellman, X509
 
 # Output should be colored
 colors = True
@@ -65,17 +64,17 @@ while True:
 
     selection = input("> ")
     if selection == '1':
-        core.diffie_hellman.dh_main()
+        diffie_hellman.dh_main()
     elif selection == '2':
-        print("find")
+        print("Authenticate a certificate")
     elif selection == '3':
-        print("find")
+        print("Sharing a secret key")
     elif selection == '4':
-        print("find")
+        print("Encrypt a message / file")
     elif selection == '5':
-        print("find")
+        print("Decrypt a message and verify its signature")
     elif selection == '6':
-        print("find")
+        print("FULL")
     elif selection == '7':
         break
     else:

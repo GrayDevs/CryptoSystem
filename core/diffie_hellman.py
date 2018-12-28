@@ -13,9 +13,6 @@ import math
 from core import utils
 
 
-
-
-
 #########################
 #                       #
 #    PRIMITIVE ROOTS    #
@@ -72,13 +69,13 @@ def diffie_hellman(bit_len=1024, std=True):
     5. Alice et Bob calcul B^a et A^b, les deux résultats étant égaux : la clé !
         (B^a = A^b = g * (a*b)
 
-    :param p_len: <int> - bit-length of prime number
+    :param bit_len: <int> - bit-length of prime number
     :param std: <boolean> - use standard prime or generate new one
     :return: a_key: <int>
     """
 
     # Getting p and g
-    p, q, g = 0, 0, 0 # just to reference them before assignment (Warning)
+    p, q, g = 0, 0, 0  # just to reference them before assignment (Warning)
     if std:
         if bit_len == 1024:  # 160-bit prime order subgroup
             #  https://tools.ietf.org/html/rfc5114#section-2.1
@@ -94,7 +91,8 @@ def diffie_hellman(bit_len=1024, std=True):
         print("p = {0}\nq = {1}".format(p, q))
         while not ((pow(g, 2, p) != 1) and (pow(g, q, p) != 1)) and g != 0:
             g = secrets.randbelow(pow(2, 256))
-    print(g)
+    # print(g)  # debug
+
     # Generating private information
     a_private = secrets.randbelow(pow(2, 256))
     b_private = secrets.randbelow(pow(2, 256))
@@ -113,12 +111,15 @@ def diffie_hellman(bit_len=1024, std=True):
     return a_key
 
 
-def dh_main():
-    """ print menu / get input / launch Diffie-Hellman
+#########################
+#                       #
+#        Process        #
+#                       #
+#########################
 
-    :return: 0
-    """
-    print("\n# KEY GENERATION\n")
+def dh_main():
+    """ print menu / get input / launch Diffie-Hellman """
+    bit_len, std = 1024, True  # Default values
 
     # Menu 1 - keylen
     dh_menu_keylen = {
@@ -163,11 +164,14 @@ def dh_main():
         else:
             print("Unknown Option Selected!\n")
 
-    # Check / debug
+    print("\n# KEY GENERATION\n")
     key = diffie_hellman(bit_len, std)
+
+    # Check / debug
     print(key, "\n")
 
     return 0
+
 
 # Local Test
 if __name__ == "__main__":

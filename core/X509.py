@@ -2,19 +2,22 @@
 
 import hashlib
 from datetime import datetime
-
+import secrets
 
 class Certificate(object):
     """ This class is responsible for managing the certificates. """
 
-    def __init__(self):
+    def __init__(self, public_key, keylen, subject_public_key):
+        self.public_key = public_key
+        self.keylen = keylen
+        self.subject_public_key = subject_public_key
         pass
 
-    def new_certificate(self, public_key):
+    def new_certificate(self):
 
         data = {
             'version_number': 3,
-            'serial_number': 0x10e6fc62b7418ad5005e45b6, # Generating
+            'serial_number': hex(secrets.randbits(70)).zfill(20), # Generating
             'signature_algorithm_ID': "sha3WithRSAEncryption",
             'issuer_name': "C=FR, O=UTT",
             'validity_period': [

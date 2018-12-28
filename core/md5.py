@@ -19,7 +19,7 @@ def left_rotate(x, c):
 
 # NOT x = x XOR mask
 def bitwise_not(x):
-    return x ^ 0x11111111
+    return x ^ 0xFFFFFFFF
 
 
 def md5(message):
@@ -58,26 +58,18 @@ def md5(message):
         55: 2240044497, 56: 1873313359, 57: 4264355552, 58: 2734768916, 59: 1309151649,
         60: 4149444226, 61: 3174756917, 62: 718787259, 63: 3951481745
     }
-
+    # Init Vectors
     h0, h1, h2, h3 = 0x67452301, 0xefcdab89, 0x98badcfe, 0x10325476
 
     # Pre-processing: padding
     # append "1" bit to message
     message = bin(message)[2:] + '1'
-    original_message_len = len(message)  # grabing message len
+    original_message_len = len(message) - 1  # grabing message len
     # append "0" bit until message length in bits ≡ 448 (mod 512)
-    message = message.ljust(512 * ceil(original_message_len / 512) - 64, '0')
+    message += ''.zfill((448 - len(message)) % 512)
     # append original length on 64 bits to message
-    message = message + str(bin(original_message_len)[2:].zfill(64))
+    message += bin(original_message_len)[2:].zfill(64)
     assert len(message) % 512 == 0
-    """
-    message = '1' + bin(message)[2:]
-    original_message_len = len(message)
-    message = message.zfill(512 * ceil(original_message_len / 512) - 64)
-    message = str(bin(original_message_len)[2:].zfill(64)) + message
-    print(message)
-    assert len(message) % 512 == 0
-    """
 
     # Process the message in successive 512-bit chunks:
     message_chunk = []
@@ -93,49 +85,53 @@ def md5(message):
         A, B, C, D = h0, h1, h2, h3
         # Main loop:
         for j in range(64):
-            F, g = 0, 0
+            F, g = 0, 0  # reset (reference before assignment
             if (0 <= j <= 15):
-                F = (B & C) | ((~B) & D)  # F = D ^ (B & (C ^ D))
+                F = (B & C) | ((~B) & D)
                 g = j
             elif (16 <= j <= 31):
                 F = (D & B) | ((~D) & C)  # F = (C ^ (D & (B ^ C)))
                 g = (5 * j + 1) % 16
             elif (32 <= j <= 47):
-                F = B ^ C ^ D
+                F = (B ^ C) ^ D
                 g = (3 * j + 5) % 16
             elif (48 <= j <= 63):
                 F = C ^ (B | (~D))
                 g = (7 * j) % 16
-            # print(i, j, F, F < 0x100000000, g)
             # Be wary of the below definitions of a,b,c,d
-            F = (F + A + K[j] + M[g]) & 0xffffffff
+            F = (F + A + K[j] + M[g]) % 0x100000000 # Wrapping mod 2^(32)
             A = D
             D = C
             C = B
-            B = (B + left_rotate(F, S[j])) & 0xffffffff
-            assert F < 4294967296 and A < 4294967296 and B < 4294967296 and C < 4294967296 and D < 4294967296
+            B = (B + left_rotate(F, S[j]))
+            A, B, C, D = A % 0x100000000, B % 0x100000000, C % 0x100000000, D % 0x100000000
+            assert A < 0x100000000 and B < 0x100000000 and C < 0x100000000 and D < 0x100000000
 
         # Add this chunk's hash to result so far:
-        h0 = (h0 + A) & 0xffffffff
-        h1 = (h1 + B) & 0xffffffff
-        h2 = (h2 + C) & 0xffffffff
-        h3 = (h3 + D) & 0xffffffff
+        h0 = (h0 + A) % 0x100000000  # equivalent to & 0xFFFFFFFF
+        h1 = (h1 + B) % 0x100000000
+        h2 = (h2 + C) % 0x100000000
+        h3 = (h3 + D) % 0x100000000
 
     digest = (hex(h0)[2:] + hex(h1)[2:] + hex(h2)[2:] + hex(h3)[2:]).zfill(32)
     return digest
 
 
 if __name__ == "__main__":
-    message = 'bonjour'
-    result = hashlib.md5(str.encode(message, 'utf-8'))
 
-    ################################################################################
-    # message = input("Message to hash: ")
+    message = 'bonjour'  # message = "Wikipedia, l'encyclopedie libre et gratuite"
     message_as_bytes = str.encode(message, 'utf-8')  # to bytes
-    message_as_int = int.from_bytes(message_as_bytes, 'little')  # to little endians
-    hashier = md5(message_as_int)
 
+    result = hashlib.md5(message_as_bytes)
     print(result.hexdigest())
-    print(hashier)
 
+    hash = md5(int.from_bytes(message_as_bytes, 'little'))
+    print(hash)
+
+    i = 68969272730655891239605054869042654276844651827212553751334886072329800586909412564471559812887552090924404880318645794717208219788400153890760005854003161593087072410255609330996402602989057233677011209171203695471405928606489699143220724585986458166708687719103387715512958241482703956516879153367779057051
+    ibis = bytes.fromhex(hex(i)[2:])
+    hash = md5(i)
+    print(hash)
+    result = hashlib.md5(ibis)
+    print(result.hexdigest())
     pass
