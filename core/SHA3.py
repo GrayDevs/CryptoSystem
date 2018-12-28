@@ -336,7 +336,7 @@ def fonctionRecuperation(HashBloc, HashString, p, r):
 
     # print("taille hash : " + str(len(Hash)))
     # print("Sha3-"+p+"bits ->"+HashString)
-    Hash = Hash[:int(p)]#hash tronqué obtenir p bits
+    Hash = Hash[:int(p)]#hash tronqué pour obtenir p bits
 
     return str(Hash)
 
