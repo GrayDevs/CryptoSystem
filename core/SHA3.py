@@ -1,5 +1,5 @@
 import sys
-from time import process_time, sleep
+from time import sleep
 import numpy as np
 from math import *
 
@@ -85,7 +85,6 @@ def convBin(fichier):
     """
     fic = open(fichier, "r", encoding="ISO-8859-1").read()
     fichierbinaire = ''.join(format(ord(x), 'b') for x in fic)
-
     return fichierbinaire
 
 
@@ -391,14 +390,30 @@ def string_to_array(string_hash):
     return block_hash
 
 
-def sha3_auto(filename, lgHash=256):
+#########################
+#                       #
+#     MAIN FUNCTIONS    #
+#                       #
+#########################
+
+def sha3_txt(txt, lgHash=256):
+    r, c, block_len = bloc(lgHash)
+    binary_txt = bin(int.from_bytes(str.encode(txt, 'utf-8'), 'little'))[2:]
+    messagePadding = padding(binary_txt, r)
+    HashBloc, HashString = hash(messagePadding, r)
+    RecupHash = fonctionRecuperation(HashBloc, lgHash, r)
+    hexdigest = hex(int(str(RecupHash), 2)).zfill(lgHash // 4)
+
+    return hexdigest
+
+
+def sha3_file(filename, lgHash=256):
     """ Sha3 with given parameters
 
     :param filename: <str>
     :param lgHash: <int> hash length
     :return: hexdigest <str> -
     """
-
     for i in tqdm(range(100), desc="Generating SHA3 Hash"):
         if i == 0:
             r, c, block_len = bloc(lgHash)
@@ -411,8 +426,9 @@ def sha3_auto(filename, lgHash=256):
         elif i == 60:
             RecupHash = fonctionRecuperation(HashBloc, lgHash, r)
         elif i == 80:
-                hexdigest = hex(int(str(RecupHash), 2)).zfill(lgHash // 4)
+            hexdigest = hex(int(str(RecupHash), 2)).zfill(lgHash // 4)
         sleep(0.01)
+
     sys.stdout.flush()
     return hexdigest
 
@@ -444,12 +460,19 @@ if __name__ == '__main__':
     # sha3_main()
 
     # ----------------
-    # sha3_auto() TEST
+    # sha3_txt() TEST
+    plaintext_hash = sha3_txt("bonjour")
+    print(plaintext_hash)
+
+    """
+    # ----------------
+    # sha3_file() TEST
     file = "C:/Users/antoine/Desktop/CryptoSystem/core/tests/idea_test.txt"
-    plaintext_hash = sha3_auto(file)
+    plaintext_hash = sha3_file(file)
     # Check
     expected_result = '0x2d852e36053c8f30d3635a53c286001e97643bd8397d0bfda82fbd946375f8bc'
     assert expected_result == plaintext_hash
     print("Hash:\033[1;32m", plaintext_hash, "\x1b[0m")
+    """
 
     pass

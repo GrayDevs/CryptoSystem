@@ -50,11 +50,11 @@ args = parser.parse_args()
 
 # Menu
 menu = {}
-menu['[1]'] = "Generate keys"
+menu['[1]'] = "Generate a Diffie-Hellman Key"
 menu['[2]'] = "Authenticate a public key / certificate"
 menu['[3]'] = "Sharing a secrete key"
-menu['[4]'] = "Encrypt a message / file (and sign it)"
-menu['[5]'] = "Decrypt a message and verify its signature"
+menu['[4]'] = "Encrypt a file (and sign it)"
+menu['[5]'] = "Decrypt a file and verify its signature"
 menu['[6]'] = "FULL"
 menu['[7]'] = "Exit"
 while True:
