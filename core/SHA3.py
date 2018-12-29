@@ -467,7 +467,7 @@ if __name__ == '__main__':
     """
     # ----------------
     # sha3_file() TEST
-    file = "C:/Users/antoine/Desktop/CryptoSystem/core/tests/idea_test.txt"
+    file = "tests/idea_test.txt"
     plaintext_hash = sha3_file(file)
     # Check
     expected_result = '0x2d852e36053c8f30d3635a53c286001e97643bd8397d0bfda82fbd946375f8bc'
