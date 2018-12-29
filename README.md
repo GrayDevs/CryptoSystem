@@ -10,6 +10,7 @@
   <!-- <a href="https://github.com/s0md3v/Photon/releases"> -->
     <img src="https://badgen.net/badge/release/v0.0.0/blue">
   <!-- </a> -->
+  <img src="https://badgen.net/badge/Python/3.6 | 3.7/blue">
   <!-- <a href="https://pypi.org/project/photon/">  -->
     <img src="https://badgen.net/badge/build/passing/green">
   <!-- </a> -->
