@@ -3,7 +3,6 @@
 
 """ This module implements the IDEA algorithm
 @see: https://en.wikipedia.org/wiki/International_Data_Encryption_Algorithm
-@see: https://en.wikipedia.org/wiki/Threefish
 
 # Interesting point
     > IDEA algorithm entirely avoids the use of any lookup tables or S-boxes.
@@ -25,7 +24,6 @@ import hashlib
 import textwrap
 
 from core import block_feeder, utils
-# from core.diffie_hellman import diffie_hellman
 
 
 #########################
@@ -120,10 +118,8 @@ class IDEA(object):
 
         sub_keys = []
         for i in range(52):
-            sub_keys.append((key >> (112 - 16 * (
-                    i % int(self.keylength / 16)))) % 0x10000)  # slicing the key into X 16bits long parts
-            if i % int(self.keylength / 16) == int(
-                    self.keylength / 16) - 1:  # keylength = 128, i = {7, 15, 23, 31, 39, 47}
+            sub_keys.append((key >> ((self.keylength - 16) - 16 * (i % (self.keylength // 16)))) % 0x10000)  # slicing the key into X 16bits long parts
+            if i % int(self.keylength // 16) == (self.keylength // 16) - 1:  # keylength = 128, i = {7, 15, 23, 31, 39, 47}
                 # x << y basically returns x with the bits shifted to the left by y places, BUT new bits on the right-hand-side are replaced by zeros.
                 # To obtain a clean permutation, we simply do (x << y) OR (x >> (len(x)-y))
                 key = ((key << 25) | (key >> (self.keylength - 25))) % modulo
@@ -420,7 +416,7 @@ def idea_main_encryption():
     print("-------------------------------------------PASSWORD-------------------------------------------")
     # key = diffie_hellman(1024, True)  # Launch Diffie Hellman with default values
     print("\033[1;34m[?]\033[1;m", "PASSWORD", "\x1b[0m", "(diffie-hellman shared key)")
-    key = input("IDEA/> ") # convert <srt> to <int>
+    key = input("IDEA/> ")  # convert <srt> to <int>
     bytes_key = bytes.fromhex(key[2:])
     if key_len == 128:
         key = int.from_bytes(hashlib.md5(bytes_key).digest(), 'little')
@@ -428,8 +424,8 @@ def idea_main_encryption():
         key = int.from_bytes(hashlib.sha3_256(bytes_key).digest(), 'little')
     else:
         raise ValueError("Wrong key length value")
-    #print('\033[91mKEY:', hex(key), '\x1b[0m')
-    #input("Please Consider Saving this Key... (Press any Key)")
+    # print('\033[91mKEY:', hex(key), '\x1b[0m')
+    # input("Please Consider Saving this Key... (Press any Key)")
 
     print("---------------------------------------SELECTING A FILE---------------------------------------")
     filename = utils.get_filename()
@@ -536,8 +532,6 @@ def idea_main_decryption():
         utils.write_file(new_file + ".txt", unpadded_to_bytes)
     except:
         print("It seems like you entered the wrong Password")
-
-
 
     return 0
 
