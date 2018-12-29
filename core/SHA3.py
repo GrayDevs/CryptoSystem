@@ -1,11 +1,19 @@
 import sys
+from time import process_time
 import numpy as np
 from math import *
+
+""" SHA3 Hash Implementation
+
+Works for different hash length:
+> 256 bits
+> 384 bits
+> 512 bits
+"""
 
 
 def bloc(lgHash):
     """ bloc =r+c bits
-
     :param lgHash:
     :return: (r, c, tailleBloc):
     """
@@ -14,17 +22,17 @@ def bloc(lgHash):
     tailleBloc = 1600
     r = tailleBloc - c
 
-    print("r :" + str(r))
-    print("c " + str(c))
+    # print("r :" + str(r))
+    # print("c " + str(c))
 
     return r, c, tailleBloc
 
 
 def choixlgHash():
     """ choix longueur Hash utlisateur
-
     :return: lgHash
     """
+    taillehash = 0
     i = 1
     while i < 2:
         print("""Veuillez choisir une taille pour le hash ?\n
@@ -48,13 +56,12 @@ def choixlgHash():
         else:
             print("Choisir un nombre entre 1 et 3 !!!")
             i = 1
-
+    assert taillehash != 0
     return taillehash
 
 
 def ofichier():
     """ Ouvre le fichier et vérifie s'il existe
-
     :return: fichier
     """
     fichier = input("Entrez un fichier :")
@@ -71,7 +78,6 @@ def ofichier():
 
 def convBin(fichier):
     """ Convertis le fichier au format binaire
-
     :param fichier:
     :return: fichierbinaire
     """
@@ -83,28 +89,25 @@ def convBin(fichier):
 
 def padding(fichierBinaire, r):
     """ Padding multiple de r
-
     :param fichierBinaire:
     :param r:
     :return: messagePadding
     """
 
-    if (len(fichierBinaire) != r):
-        messagePadding = ("0" * ((r - (len(fichierBinaire)) % r))) + fichierBinaire
+    if len(fichierBinaire) != r:
+        messagePadding = ("0" * (r - (len(fichierBinaire)) % r)) + fichierBinaire
     else:
         messagePadding = fichierBinaire
-    # print(len(messagePadding))
     return str(messagePadding)
 
 
 def padding2(taille, xor):
     """ Padding binaire clé (clé à la taille souhaité)
-
     :param taille:
     :param xor:
     :return: resu
     """
-    if (len(xor) != taille):
+    if len(xor) != taille:
         resu = ("0" * (taille - (len(xor)) % taille)) + xor
     else:
         resu = xor
@@ -112,18 +115,14 @@ def padding2(taille, xor):
     return resu
 
 
-def hash(messagePadding, r, c, taillebloc, lgHash):
+def hash(messagePadding, r):
     """ Fonction hash = creation bloc + application fonction
-    
 
     :param messagePadding:
     :param r:
-    :param c:
-    :param taillebloc:
-    :param lgHash:
     :return:
     """
-    
+
     "Création du Bloc B0"
     B0 = [[["0" for k in range(0, 64)] for j in range(0, 5)] for i in range(0, 5)]
     "print(B0)"
@@ -134,19 +133,19 @@ def hash(messagePadding, r, c, taillebloc, lgHash):
 
     "Calcul nombre de bloc à construire"
     Nb_iteration = int(len(messagePadding) / r)
-
+    BlocString = ''
     for n in range(0, Nb_iteration):
         "Construction des différents blocs"
-        stn_p = messagePadding[n * r:(n + 1) * r] # Decoupe le message en plusieurs parties de taille r
-        if n == 0:# Construction B0 et XOR B0(r) avec P1
-            print("------------------------------------------------------Construction B" + str(
-                n) + "-----------------------------------------------------")
+        stn_p = messagePadding[n * r:(n + 1) * r]  # Decoupe le message en plusieurs parties de taille r
+        if n == 0:  # Construction B0 et XOR B0(r) avec P1
+            # print("------------------------------------------------------Construction B" + str(n)
+            # + "-----------------------------------------------------")
             rhashB0 = B0_string[:r]
             RXOR = xor_binaire(rhashB0, stn_p)
             Bloc = RXOR + B0_string[r:]
-        else: #Construction des autres blocs et XOR Bn(r) avec Pn+1
-            print("------------------------------------------------------Construction B" + str(
-                n) + "-----------------------------------------------------")
+        else:  # Construction des autres blocs et XOR Bn(r) avec Pn+1
+            # print("------------------------------------------------------Construction B" + str(n)
+            # + "-----------------------------------------------------")
             rhashB = BlocString[:r]
             RXOR = xor_binaire(rhashB, stn_p)
             Bloc = RXOR + BlocString[r:]
@@ -158,10 +157,6 @@ def hash(messagePadding, r, c, taillebloc, lgHash):
             "Application fonction f"
             # print("Fonction de hashage :" + str(i+1) + "ème iteration")
             BlocTab, BlocString = fonctionHASH(BlocTab)
-
-            pass
-
-    pass
 
     # print("hash-"+lgHash+"bits ->" + BlocString)
     # print("-------------TEST--------------")
@@ -181,7 +176,6 @@ def hash(messagePadding, r, c, taillebloc, lgHash):
 
 def bit_parite(bloc):
     """
-
     :param bloc:
     :return: valeurBitParité
     """
@@ -190,15 +184,14 @@ def bit_parite(bloc):
     var = bit.count('1')
     # print("nombre de 1 " + str(var))
 
-    if var % 2 == 0:#pair
+    if var % 2 == 0:  # pair
         return "00000"
-    else:#impair
+    else:  # impair
         return "11111"
 
 
 def padding3(Bloc):
     """Padding pour un bloc
-
     :param Bloc:
     :return: BlocN
     """
@@ -212,7 +205,6 @@ def padding3(Bloc):
 
 def fonctionHASH(BlocTab):
     """ Creation de la fonction f utilisé dans hash
-
     :param BlocTab:
     :return: BlocEtape, BlocString
     """
@@ -226,7 +218,8 @@ def fonctionHASH(BlocTab):
             # print("------Parité------")
             # print(bit_parite(''.join(BlocTab[:,j,k-1])))
             # print("FIN -------------")
-            Bloc = xor_binaire(''.join(BlocTab[:, j, k]), bit_parite(''.join(BlocTab[:, j, k - 1])))#XOr avec le bit de parité
+            Bloc = xor_binaire(''.join(BlocTab[:, j, k]),
+                               bit_parite(''.join(BlocTab[:, j, k - 1])))  # XOr avec le bit de parité
             # print("1 -> " +str(Bloc))
             # BlocN1 = str(padding3(Bloc1))
             BlocEtape1[:, j, k] = list(str(Bloc))
@@ -235,10 +228,8 @@ def fonctionHASH(BlocTab):
         # print("2 -> " + str(Bloc))
         # BlocN2 = str(padding3(Bloc2))
         BlocEtape1[:, j, 0] = list(Bloc)
-        pass
-    pass
 
-    BlocString1 = array_to_string(BlocEtape1)
+    # BlocString1 = array_to_string(BlocEtape1)
     # print("Etape 1 : " + BlocString1)
 
     "Etape 2"
@@ -246,22 +237,20 @@ def fonctionHASH(BlocTab):
     for i in range(0, 5):
         for j in range(0, 5):
             tj, ti = T(j, i)
-            BlocEtape2[i, j, :] = BlocEtape1[(ti + i) % 5, (tj + j) % 5, :]#On permute les blocs de 64bits en fonction de T
-        pass
-    pass
+            # On permute les blocs de 64bits en fonction de T
+            BlocEtape2[i, j, :] = BlocEtape1[(ti + i) % 5, (tj + j) % 5, :]
 
-    BlocString2 = array_to_string(BlocEtape2)
+    # BlocString2 = array_to_string(BlocEtape2)
     # print("Etape 2 : " + BlocString2)
 
     "Etape 3"
     BlocEtape3 = BlocEtape2
     for i in range(0, 5):
         for j in range(0, 5):
-            BlocEtape3[i, j, :] = BlocEtape2[j, (2 * i + 3 * j) % 5, :]#On permute les blocs de 64bits en fonction de j > (2i+3j)%5
-        pass
-    pass
+            # On permute les blocs de 64bits en fonction de j > (2i+3j)%5
+            BlocEtape3[i, j, :] = BlocEtape2[j, (2 * i + 3 * j) % 5, :]
 
-    BlocString3 = array_to_string(BlocEtape3)
+    # BlocString3 = array_to_string(BlocEtape3)
     # print("Etape 3 : " + BlocString3)
 
     "Etape 4"
@@ -272,22 +261,22 @@ def fonctionHASH(BlocTab):
             # print(''.join(BlocEtape3[i, j, :]))
             # print(And(''.join(BlocEtape3[i, j + 1, :]),''.join(BlocEtape3[i, j - 1, :])))
             # print("---------")
-            bloc = xor_binaire(''.join(BlocEtape3[i, j, :]), And(''.join(BlocEtape3[i, (j + 1)%5, :]), ''.join(BlocEtape3[i, (j - 1)%5, :])))#XOR entre lignes
+            bloc = xor_binaire(''.join(BlocEtape3[i, j, :]), And(''.join(BlocEtape3[i, (j + 1) % 5, :]), ''.join(
+                BlocEtape3[i, (j - 1) % 5, :])))  # XOR entre lignes
             # print("(-------)")
             # print(bloc)
             # print("(-------)")
             BlocEtape4[i, j, :] = list(bloc)
-        pass
-    pass
 
-    BlocString4 = array_to_string(BlocEtape4)
+    # BlocString4 = array_to_string(BlocEtape4)
     # print("Etape 4 : " + BlocString4)
 
     "Etape 5"
     BlocEtape5 = BlocEtape4
     for m in range(0, 6):
         for j in range(1, 5):
-            BlocEtape5[j, j, :] = xor_binaire(BlocEtape4[j, j, (2 ^ m - 1) % 64], BlocEtape4[j, j, m + 7 * lfsr(m)])#XOR entre certains bits
+            BlocEtape5[j, j, :] = xor_binaire(BlocEtape4[j, j, (2 ^ m - 1) % 64],
+                                              BlocEtape4[j, j, m + 7 * lfsr(m)])  # XOR entre certains bits
 
     BlocString5 = array_to_string(BlocEtape5)
     # print("Etape 5 : " + BlocString5)
@@ -297,7 +286,6 @@ def fonctionHASH(BlocTab):
 
 def lfsr(m):
     """ LFSR
-
     :param m:
     :return: ValeurLFSR
     """
@@ -309,18 +297,16 @@ def lfsr(m):
     return lfsr_tab[m + 8]
 
 
-def fonctionRecuperation(HashBloc, HashString, p, r):
+def fonctionRecuperation(HashBloc, p, r):
     """ Phase de recuperation
-
     :param HashBloc:
-    :param HashString:
-    :param p:
-    :param r:
+    :param p: <int>
+    :param r: <int>
     :return: Hash: <str> -
     """
 
     m = ceil(int(r) / int(p))
-    c = int(r) + int(p)
+    # c = int(r) + int(p)
     # print("m : " + str(m))
 
     for i in range(0, m - 1):
@@ -330,18 +316,17 @@ def fonctionRecuperation(HashBloc, HashString, p, r):
         if i == 0:
             Hash = str(HashString[:r])
         else:
-            Hash = str(HashString[:r]) + str(Hash)#Concaténation morceaux de hash
+            Hash = str(HashString[:r]) + str(Hash)  # Concaténation morceaux de hash
 
     # print("taille hash : " + str(len(Hash)))
     # print("Sha3-"+p+"bits ->"+HashString)
-    Hash = Hash[:int(p)]#hash tronqué pour obtenir p bits
+    Hash = Hash[:int(p)]  # hash tronqué obtenir p bits
 
     return str(Hash)
 
 
 def T(j, i):
     """ Calcul de valeur ti et tj pour etape 2 fonction f
-
     :param j:
     :param i:
     :return:
@@ -353,7 +338,6 @@ def T(j, i):
 
 def And(a, c):
     """fonction and binaire
-
     :param a:
     :param c:
     :return: rvar
@@ -365,7 +349,6 @@ def And(a, c):
 
 def xor_binaire(r, p):
     """ fonction xor binaire
-
     :param r:
     :param p:
     :return: RXOR
@@ -377,7 +360,6 @@ def xor_binaire(r, p):
 
 def array_to_string(bloc):
     """fonction array_to_string
-
     :param bloc:
     :return: string_hash
     """
@@ -387,13 +369,11 @@ def array_to_string(bloc):
             string_hash = string_hash + ''.join(bloc[i, j, :])
 
     string_hash = string_hash[1:]
-    # print(len(string_hash))
     return string_hash
 
 
 def string_to_array(string_hash):
     """ fonction string_to_array
-
     :param string_hash:
     :return: bloc_hash
     """
@@ -409,26 +389,25 @@ def string_to_array(string_hash):
     return block_hash
 
 
-def sha3_auto_main(fichier, lgHash=256):
-    """
+def sha3_auto(filename, lgHash=256):
+    """ Sha3 with given parameters
 
-    :param fichier:
-    :param lgHash:
-    :return:
+    :param filename: <str>
+    :param lgHash: <int> hash length
+    :return: hexdigest <str> -
     """
-    r, c, taillebloc = bloc(lgHash)
-    fichierBinaire = convBin(fichier)
-    messagePadding = padding(fichierBinaire, r)
-    HashBloc, HashString = hash(messagePadding, r, c, taillebloc, lgHash)
-    RecupHash = fonctionRecuperation(HashBloc, HashString, lgHash, r)
-    print(RecupHash)
+    r, c, block_len = bloc(lgHash)
+    binary_file = convBin(filename)
+    messagePadding = padding(binary_file, r)
+    HashBloc, HashString = hash(messagePadding, r)
+    RecupHash = fonctionRecuperation(HashBloc, lgHash, r)
 
-    return 0
+    hexdigest = hex(int(str(RecupHash), 2)).zfill(lgHash // 4)
+    return hexdigest
 
 
 def sha3_main():
     """
-
     :return:
     """
     print("------Hashage sha-3----------")
@@ -442,14 +421,26 @@ def sha3_main():
         "----------------------------------------------------------PADDING---------------------------------------------------------")
     print(
         "-------------------------------------------------------Initialisation-----------------------------------------------------")
-    HashBloc, HashString = hash(messagePadding, r, c, taillebloc, lgHash)
+    HashBloc, HashString = hash(messagePadding, r)
     print(
         "---------------------------------------------------Phase de récupération--------------------------------------------------")
-    RecupHash = fonctionRecuperation(HashBloc, HashString, lgHash, r)
+    RecupHash = fonctionRecuperation(HashBloc, lgHash, r)
     print("Hash-" + lgHash + "bits =>" + RecupHash)
     print("Taille de Hash = " + str(len(RecupHash)))
 
-    return 0
 
 if __name__ == '__main__':
-    sha3_main()
+    # sha3_main()
+
+    # sha3_auto() TEST
+    file = "C:/Users/antoine/Desktop/CryptoSystem/core/tests/idea_test.txt"
+    print("**** Generating a hash ****")
+    t = process_time()
+    plaintext_hash = sha3_auto(file)
+    # Check
+    expected_result = '0x2d852e36053c8f30d3635a53c286001e97643bd8397d0bfda82fbd946375f8bc'
+    assert expected_result == plaintext_hash
+
+    print("Hash successfully generated in", process_time() - t)
+    print("Hash:", plaintext_hash)
+

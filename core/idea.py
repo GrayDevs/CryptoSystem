@@ -518,7 +518,7 @@ def idea_main_decryption():
     unpadded = block_feeder.PKCS7_unpadding(output)
     unpadded_to_bytes = bytes.fromhex(unpadded)
 
-    wrap = textwrap.fill(unpadded_to_bytes, 94)
+    wrap = textwrap.fill(str(unpadded_to_bytes)[2:], 94)
     print(wrap)
 
     print("----------------------------------SAVING DECRYPTED TEXT-----------------------------------")
