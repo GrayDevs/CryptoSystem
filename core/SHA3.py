@@ -1,7 +1,9 @@
 import sys
-from time import process_time
+from time import process_time, sleep
 import numpy as np
 from math import *
+
+from tqdm import tqdm
 
 """ SHA3 Hash Implementation
 
@@ -396,13 +398,22 @@ def sha3_auto(filename, lgHash=256):
     :param lgHash: <int> hash length
     :return: hexdigest <str> -
     """
-    r, c, block_len = bloc(lgHash)
-    binary_file = convBin(filename)
-    messagePadding = padding(binary_file, r)
-    HashBloc, HashString = hash(messagePadding, r)
-    RecupHash = fonctionRecuperation(HashBloc, lgHash, r)
 
-    hexdigest = hex(int(str(RecupHash), 2)).zfill(lgHash // 4)
+    for i in tqdm(range(100), desc="Generating SHA3 Hash"):
+        if i == 0:
+            r, c, block_len = bloc(lgHash)
+        elif i == 5:
+            binary_file = convBin(filename)
+        elif i == 10:
+            messagePadding = padding(binary_file, r)
+        elif i == 30:
+            HashBloc, HashString = hash(messagePadding, r)
+        elif i == 60:
+            RecupHash = fonctionRecuperation(HashBloc, lgHash, r)
+        elif i == 80:
+                hexdigest = hex(int(str(RecupHash), 2)).zfill(lgHash // 4)
+        sleep(0.01)
+    sys.stdout.flush()
     return hexdigest
 
 
@@ -432,15 +443,13 @@ def sha3_main():
 if __name__ == '__main__':
     # sha3_main()
 
+    # ----------------
     # sha3_auto() TEST
     file = "C:/Users/antoine/Desktop/CryptoSystem/core/tests/idea_test.txt"
-    print("**** Generating a hash ****")
-    t = process_time()
     plaintext_hash = sha3_auto(file)
     # Check
     expected_result = '0x2d852e36053c8f30d3635a53c286001e97643bd8397d0bfda82fbd946375f8bc'
     assert expected_result == plaintext_hash
+    print("Hash:\033[1;32m", plaintext_hash, "\x1b[0m")
 
-    print("Hash successfully generated in", process_time() - t)
-    print("Hash:", plaintext_hash)
-
+    pass
