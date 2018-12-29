@@ -2,7 +2,13 @@ import sys
 import numpy as np
 from math import *
 
+""" SHA3 Hash Implementation
 
+Works for different hash length:
+> 256 bits
+> 384 bits
+> 512 bits
+"""
 def bloc(lgHash):
     """ bloc =r+c bits
     :param lgHash:
@@ -398,20 +404,21 @@ def string_to_array(string_hash):
     return block_hash
 
 
-def sha3_auto_main(fichier, lgHash=256):
+def sha3_auto_main(filename, lgHash=256):
     """
-    :param fichier:
-    :param lgHash:
-    :return:
-    """
-    r, c, taillebloc = bloc(lgHash)
-    fichierBinaire = convBin(fichier)
-    messagePadding = padding(fichierBinaire, r)
-    HashBloc, HashString = hash(messagePadding, r, c, taillebloc, lgHash)
-    RecupHash = fonctionRecuperation(HashBloc, HashString, lgHash, r)
-    print(RecupHash)
 
-    return 0
+    :param filename: <str>
+    :param lgHash: <int> hash length
+    :return: hexdigest <str> -
+    """
+    r, c, block_len = bloc(lgHash)
+    binary_file = convBin(filename)
+    messagePadding = padding(binary_file, r)
+    HashBloc, HashString = hash(messagePadding, r, c, block_len, lgHash)
+    RecupHash = fonctionRecuperation(HashBloc, HashString, lgHash, r)
+
+    hexdigest = hex(int(str(RecupHash),2))
+    return hexdigest
 
 def sha3_main():
     """
@@ -437,4 +444,9 @@ def sha3_main():
 
 
 if __name__ == '__main__':
-    sha3_main()
+    # sha3_main()
+    fileroot = "C:/Users/antoine/Desktop/CryptoSystem/core/"
+    plaintext_hash = sha3_auto_main(fileroot + "tests/idea_test.txt")
+    decrypted_hash = sha3_auto_main(fileroot + "zererg.txt")
+    print(plaintext_hash)
+    print(decrypted_hash)
