@@ -6,19 +6,21 @@
 # import
 import argparse
 import sys
+import textwrap
+
 from core import idea, SHA3, diffie_hellman, X509
 
 # Output should be colored
 colors = True
 # Detecting the OS of current system
 machine = sys.platform
-if machine.lower().startswith(('os', 'win', 'darwin', 'ios')):
+if machine.lower().startswith(('os', 'darwin', 'ios')):
     # Colors shouldn't be displayed on macOS and Windows
     colors = False
 if not colors:
     end = red = white = green = yellow = run = bad = good = info = que = ''
 else:
-    end = '\033[1;m'
+    end = '\x1b[0m'  # '\033[1;m'
     red = '\033[91m'
     white = '\033[1;97m'
     green = '\033[1;32m'
@@ -48,36 +50,66 @@ parser.add_argument('-v', '--verbose', help='verbose output', dest='verbose', ac
 # ...
 args = parser.parse_args()
 
+# Some Checking parameters
+cert_created, cert_authenticated = False, False
+
 # Menu
 menu = {}
-menu['[1]'] = "Generate a Diffie-Hellman Key"
-menu['[2]'] = "Authenticate a public key / certificate"
-menu['[3]'] = "Sharing a secrete key"
-menu['[4]'] = "Encrypt a file (and sign it)"
-menu['[5]'] = "Decrypt a file and verify its signature"
-menu['[6]'] = "FULL"
+menu['[1]'] = "Generate a Diffie-hellman Public Key"
+menu['[2]'] = "Create and sign a certificate"
+menu['[3]'] = "Authenticate a certificate"
+menu['[4]'] = "Sharing a secret key"
+menu['[5]'] = "Encrypt a file (and sign it)"
+menu['[6]'] = "Decrypt a file and verify its signature"
 menu['[7]'] = "Exit"
 while True:
+    print("\n--- GS15 Main Menu")
     options = menu.keys()
     for entry in options:
         print(entry, menu[entry])
 
-    selection = input("> ")
+    selection = input("/> ")
     if selection == '1':
-        diffie_hellman.dh_main()
+        A, g, p = diffie_hellman.dh_public_keygen()
+        print(run, "Public Key: [A, g, p]\x1b[0m (copy the following line):\n{0}\n{1}\n{2}".format(A, g, p))
     elif selection == '2':
-        print("Authenticate a certificate")
+        print(run, "\x1b[0mStep 1) Creating a certificate")
+        A = int(input("Type in A:"))
+        g = int(input("Type in g:"))
+        p = int(input("Type in p:"))
+        public_key = [A, g, p]
+        cert = X509.Certificate(public_key)
+        print(run, "\x1b[0mStep 2) Make it signed by a trusted third party")
+        X509.UTT_Signature(cert)
+        cert_created = True
     elif selection == '3':
-        print("Sharing a secret key")
+        if cert_created:
+            print("\033[1;97m[~]\x1b[0m Getting Third Party Public Key ...")
+            utt_n, utt_e = X509.UTT_Keys()[:2]
+            wrap_n = textwrap.fill(hex(utt_n), 94, initial_indent="\t", subsequent_indent="\t\t")
+            print("\033[1;97m[~]\x1b[0m UTT Public Keys:\n\tn:{0}\n\te:\t{1}".format(wrap_n, hex(utt_e)))
+            cert.pk_signature_check(utt_n, utt_e)
+            cert_authenticated = True
+        else:
+            print(info, "You must Create a certificate before trying to authentify one", end)
     elif selection == '4':
-        print("Encrypt a message / file")
+        print(que, "\x1b[0mDirect Sharing (y) / Sharing through certificate")
+        choice = input("KeyGen/> ")
+        if choice == "y" or choice == "Y":
+            diffie_hellman.dh_main()
+        elif cert_authenticated:
+            print(diffie_hellman.dh_keygen(cert.subject_public_key[:-1]))
+        else:
+            print(info, "You must Create and Authenticate a certificate before sharing key through it", end)
     elif selection == '5':
-        print("Decrypt a message and verify its signature")
+        print(run, "Encrypt a file (and sign it)", end)
+        idea.idea_main_encryption()
     elif selection == '6':
-        print("FULL")
+        print(run, "Decrypt a message (and verify its signature)", end)
+        idea.idea_main_decryption()
     elif selection == '7':
         break
     else:
-        print("Unknown Option Selected!\n")
+        print(info, "Unknown Option Selected!", end)
 
 print('\n# Exit...')

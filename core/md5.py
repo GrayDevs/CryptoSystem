@@ -119,10 +119,11 @@ def md5(message):
 
 if __name__ == "__main__":
     message = 'bonjour'  # message = "Wikipedia, l'encyclopedie libre et gratuite"
+    print("# Message: \t\t\t", message)
     message_as_bytes = str.encode(message, 'utf-8')  # to bytes
     result = hashlib.md5(message_as_bytes)
-    print("Hashlib Standard Result:", result.hexdigest(), type(result.hexdigest()))
+    print("Standard Result:\t", result.hexdigest())
     hash = md5(int.from_bytes(message_as_bytes, 'little'))
-    print("Custom MD5 Result:\t\t", hash, type(hash))
+    print("Custom MD5 Result:\t", hash)
 
     pass

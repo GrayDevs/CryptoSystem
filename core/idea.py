@@ -25,7 +25,7 @@ import hashlib
 import textwrap
 
 from core import block_feeder, utils
-from core.diffie_hellman import diffie_hellman
+# from core.diffie_hellman import diffie_hellman
 
 
 #########################
@@ -417,18 +417,19 @@ def idea_main_encryption():
     print("========================================IDEA ENCRYPTION========================================")
     key_len, mod_of_operation = idea_menu()
 
-    print("----------------------------------------KEY GENERATION----------------------------------------")
-    key = diffie_hellman(1024, True)  # Launch Diffie Hellman with default values
-    bytes_key = key.to_bytes((key.bit_length() + 7) // 8,
-                             'little')  # key from int to bytes (compatibility with hashlib functions)
+    print("-------------------------------------------PASSWORD-------------------------------------------")
+    # key = diffie_hellman(1024, True)  # Launch Diffie Hellman with default values
+    print("\033[1;34m[?]\033[1;m", "PASSWORD", "\x1b[0m", "(diffie-hellman shared key)")
+    key = input("IDEA/> ") # convert <srt> to <int>
+    bytes_key = bytes.fromhex(key[2:])
     if key_len == 128:
         key = int.from_bytes(hashlib.md5(bytes_key).digest(), 'little')
     elif key_len == 256:
         key = int.from_bytes(hashlib.sha3_256(bytes_key).digest(), 'little')
     else:
         raise ValueError("Wrong key length value")
-    print('\033[91mKEY:', hex(key), '\x1b[0m')
-    input("Please Consider Saving this Key... (Press any Key)")
+    #print('\033[91mKEY:', hex(key), '\x1b[0m')
+    #input("Please Consider Saving this Key... (Press any Key)")
 
     print("---------------------------------------SELECTING A FILE---------------------------------------")
     filename = utils.get_filename()
@@ -493,7 +494,15 @@ def idea_main_decryption():
 
     print("-------------------------------------------PASSWORD-------------------------------------------")
     print("Please type-in the Hexadecimal password given during the encryption process")
-    key = int(input("> "), 16)
+    # key = int(input("> "), 16)
+    key = input("IDEA/> ")
+    bytes_key = bytes.fromhex(key[2:])
+    if key_len == 128:
+        key = int.from_bytes(hashlib.md5(bytes_key).digest(), 'little')
+    elif key_len == 256:
+        key = int.from_bytes(hashlib.sha3_256(bytes_key).digest(), 'little')
+    else:
+        raise ValueError("Wrong key length value")
 
     print("------------------------------------------DECRYPTION------------------------------------------")
     # Managing mode of operation
@@ -516,14 +525,19 @@ def idea_main_decryption():
         output += decrypted
 
     unpadded = block_feeder.PKCS7_unpadding(output)
-    unpadded_to_bytes = bytes.fromhex(unpadded)
+    try:
+        unpadded_to_bytes = bytes.fromhex(unpadded)
 
-    wrap = textwrap.fill(str(unpadded_to_bytes)[2:], 94)
-    print(wrap)
+        wrap = textwrap.fill(str(unpadded_to_bytes)[2:], 94)
+        print(wrap)
 
-    print("----------------------------------SAVING DECRYPTED TEXT-----------------------------------")
-    new_file = input("Enter a file name: ")
-    utils.write_file(new_file + ".txt", unpadded_to_bytes)
+        print("----------------------------------SAVING DECRYPTED TEXT-----------------------------------")
+        new_file = input("Enter a file name: ")
+        utils.write_file(new_file + ".txt", unpadded_to_bytes)
+    except:
+        print("It seems like you entered the wrong Password")
+
+
 
     return 0
 
@@ -533,5 +547,9 @@ if __name__ == "__main__":
     # idea_main_encryption()
     idea_main_decryption()
 
+    # During password (/key generation step) :
+    # bytes_key = key.to_bytes((key.bit_length() + 7) // 8, 'little')  # key from <int> to <bytes> (compatibility with hashlib functions)
+
     # LA KLAIENT = 0x5863a453b9fd82254950770b9b7ac6b7
+    # Prime = 0x4781248c843906b0ce31ab07d62e968a6b7e8c17ecdfdd4b6b78aafbc13030cde610e0aea6ce35e1d39fbf8cc6fd98caee79f83f8fc1a04d7ef2db74e02ecaabd668385c9c8b4f62d9c1ad761601e040716494cad09cde8885bea8307a82032f037440cdc2976593d142eb70e83475839a3d089cbb0ed274b994e9c7d6b5c323
     pass

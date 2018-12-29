@@ -461,7 +461,8 @@ if __name__ == '__main__':
 
     # ----------------
     # sha3_txt() TEST
-    plaintext_hash = sha3_txt("bonjour")
+    txt = "bonjour"
+    plaintext_hash = sha3_txt(txt)
     print(plaintext_hash)
 
     """

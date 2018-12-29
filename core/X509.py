@@ -147,7 +147,7 @@ if __name__ == "__main__":
     # Bob's part
     utt_n, utt_e = UTT_Keys()[:2]
     wrap_n = textwrap.fill(hex(utt_n), 94, initial_indent="\t", subsequent_indent="\t\t")
-    print("\033[1;97m[~]\033[1;m \x1b[0mUTT Public Keys:\n\tn:{0}\n\te:\t{1}".format(wrap_n, hex(utt_e)))
+    print("\033[1;97m[~]\x1b[0m UTT Public Keys:\n\tn:{0}\n\te:\t{1}".format(wrap_n, hex(utt_e)))
     alice_cert.pk_signature_check(utt_n, utt_e)
 
     pass
