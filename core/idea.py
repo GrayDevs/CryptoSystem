@@ -434,7 +434,8 @@ def idea_main_encryption():
 
     # filename = "C:/Users/antoine/Desktop/CryptoSystem/core/tests/idea_test.txt"
     print("File to encrypt:", filename)
-    cypher_file = filename.split(".", 1)[0] + '.cypher'
+    # cypher_file = filename.split(".", 1)[0] + '.cypher'
+    cypher_file = filename + '.cypher'
 
     print("------------------------------------GATHERING FILE CONTENT------------------------------------")
     hex_message = utils.get_file_hex(filename)  # Getting the Hex
@@ -487,6 +488,13 @@ def idea_main_decryption():
     filename = utils.get_filename()
     print("File to Decrypt:", filename)
 
+    # Grabbing original file extension
+    file_extension = filename.split('.cypher', 1)[0]
+    if len(file_extension.split('.', 1)) != 1:
+        file_extension = '.' + file_extension.split('.', 1)[1]
+    else:
+        file_extension = ''
+
     print("------------------------------------GATHERING FILE CONTENT------------------------------------")
     hex_message = utils.get_file_hex(filename)
     true_hex_message = bytes.decode(
@@ -535,17 +543,18 @@ def idea_main_decryption():
         print(wrap)
 
         print("----------------------------------SAVING DECRYPTED TEXT-----------------------------------")
-        new_file = input("Enter a file name: ")
-        utils.write_file(new_file + ".txt", unpadded_to_bytes)
+        # new_file = utils.save_file() + ".txt"
+        new_file = utils.save_file() + file_extension
+        utils.write_file(new_file, unpadded_to_bytes)
     except:
-        print("It seems like you entered the wrong Password")
+        print("\033[1;31m[-]\x1b[0m", "It seems like you entered the wrong Password")
 
     try:
         print("-----------------------------------HASH DECRYPTED FILE------------------------------------")
         plaintext_hash = SHA3.sha3_file(new_file, 256)
         print("\033[1;32m[+]\033[1;m", "SHA_256:\033[1;32m", plaintext_hash, "\x1b[0m")
     except:
-        print("Something went wrong during the hash process")
+        print("\033[1;31m[-]\x1b[0m", "Something went wrong during the hash process")
 
     return 0
 

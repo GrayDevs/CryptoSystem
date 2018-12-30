@@ -11,6 +11,7 @@ NB: Some of those algorithms are Pythonic implementation of pseudo-codes availab
 # write_file
 # check_file_exist
 # get_file_hex
+# get_filename
 
 # MATHS UTILS
 # gcd
@@ -88,8 +89,13 @@ def get_filename():
     root = Tk()
     root.withdraw()
     root.attributes("-topmost", True)
-    return filedialog.askopenfilename()
+    return filedialog.askopenfilename(title = "Select file to Encrypt", filetypes = (("Text Files","*.txt"),("all files","*.*")))
 
+def save_file():
+    root = Tk()
+    root.withdraw()
+    root.attributes("-topmost", True)
+    return filedialog.asksaveasfilename(title = "Select file", filetypes = (("Encrypted Files","*.cypher"), ("all files","*.*")))
 
 def get_file_hex(file_name="tests/idea_test.txt"):
     """ Getting the content of a file
@@ -408,6 +414,19 @@ if __name__ == "__main__":
     # sieve_of_eratosthenes(1000000)
     # print(fermat_primality_test(7))
     # print(rabin_miller(44600782844059322679787115580475394454610249729145792871260295110063546808692305971895255281608176659435668688076634717303552368620463427957722398118490589527180422187442349959283617691974410079937916405314415599450518488171311795228586635640346382637523377502311060484277241482917191477205629836101135468161))
-    print(mod_inv(13, 7))
-    print(mod_inv(23, 120))
+    # print(mod_inv(13, 7))
+    # print(mod_inv(23, 120))
+
+
+
+    filename = get_filename() + '.cypher'
+    print(filename)
+    file_extension = filename.split('.cypher', 1)[0]
+    if len(file_extension.split('.', 1)) != 1:
+        file_extension = '.' + file_extension.split('.', 1)[1]
+    else:
+        file_extension = ''
+    print(file_extension)
+
+    # print(save_file())
     pass

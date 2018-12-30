@@ -89,7 +89,7 @@ def diffie_hellman(bit_len=1024, std=True):
     else:
         p, q = sophie_germain(bit_len)
         print("p = {0}\nq = {1}".format(p, q))
-        while not ((pow(g, 2, p) != 1) and (pow(g, q, p) != 1)) and g != 0:
+        while not ((pow(g, 2, p) != 1) and (pow(g, q, p) != 1) and g != 0) :
             g = secrets.randbelow(pow(2, 256))
     # print(g)  # debug
 
@@ -204,7 +204,7 @@ def dh_main():
 
 # Local Test
 if __name__ == "__main__":
-    # dh_main()
-    print(dh_public_keygen())
+    dh_main()
+    # print(dh_public_keygen())
 
     pass
