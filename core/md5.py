@@ -6,6 +6,8 @@
 
 Warning :
 > md5 has known hash collision weaknesses
+
+NOT WORKING FOR SOME STRANGE REASONS
 """
 
 import hashlib
@@ -118,7 +120,7 @@ def md5(message):
 
 
 if __name__ == "__main__":
-    message = 'bonjour'  # message = "Wikipedia, l'encyclopedie libre et gratuite"
+    message = 'bonjour'
     print("# Message: \t\t\t", message)
     message_as_bytes = str.encode(message, 'utf-8')  # to bytes
     result = hashlib.md5(message_as_bytes)

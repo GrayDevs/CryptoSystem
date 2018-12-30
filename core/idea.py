@@ -19,11 +19,12 @@
     @see: https://csrc.nist.gov/publications/detail/sp/800-38a/final
 """
 
+import sys
 from secrets import randbits
 import hashlib
 import textwrap
 
-from core import block_feeder, utils
+from core import block_feeder, utils, SHA3
 
 
 #########################
@@ -366,7 +367,7 @@ def idea_menu():
     }
     # Menu 2 - ModeofOperation
     idea_menu_modOfOperation = {
-        '1-': "ECB",
+        '1-': "ECB (Deprecated)",
         '2-': "CBC",
         '3-': "PCBC"
     }
@@ -421,7 +422,8 @@ def idea_main_encryption():
     if key_len == 128:
         key = int.from_bytes(hashlib.md5(bytes_key).digest(), 'little')
     elif key_len == 256:
-        key = int.from_bytes(hashlib.sha3_256(bytes_key).digest(), 'little')
+        # key = int.from_bytes(hashlib.sha3_256(bytes_key).digest(), 'little')
+        key = int(SHA3.sha3_int(int(key, 16), 256)[2:], 16)
     else:
         raise ValueError("Wrong key length value")
     # print('\033[91mKEY:', hex(key), '\x1b[0m')
@@ -462,12 +464,16 @@ def idea_main_encryption():
     wrap = textwrap.fill(output, 94)
     print(wrap)
 
-    print("----------------------------------CREATE ENCRYPTED FILE-----------------------------------")
+    print("------------------------------------CREATE ENCRYPTED FILE-------------------------------------")
     utils.wipe_file(cypher_file)  # Clean cypher file if it already exist
     with open(cypher_file, mode='a') as file:
         file.write(output)
-    print("\x1b[6;30;42mCypher successfully created\x1b[0m")
+    print("\x1b[6;30;42mCypher successfully created\x1b[0m\n")
+    sys.stdout.flush()
 
+    print("-------------------------------------HASH PLAINTEXT FILE--------------------------------------")
+    plaintext_hash = SHA3.sha3_file(filename, 256)
+    print("\033[1;32m[+]\033[1;m", "SHA_256:\033[1;32m", plaintext_hash, "\x1b[0m")
     return 0
 
 
@@ -496,7 +502,8 @@ def idea_main_decryption():
     if key_len == 128:
         key = int.from_bytes(hashlib.md5(bytes_key).digest(), 'little')
     elif key_len == 256:
-        key = int.from_bytes(hashlib.sha3_256(bytes_key).digest(), 'little')
+        # key = int.from_bytes(hashlib.sha3_256(bytes_key).digest(), 'little')
+        key = int(SHA3.sha3_int(int(key, 16), 256)[2:], 16)
     else:
         raise ValueError("Wrong key length value")
 
@@ -533,12 +540,18 @@ def idea_main_decryption():
     except:
         print("It seems like you entered the wrong Password")
 
-    return 0
+    try:
+        print("-----------------------------------HASH DECRYPTED FILE------------------------------------")
+        plaintext_hash = SHA3.sha3_file(new_file, 256)
+        print("\033[1;32m[+]\033[1;m", "SHA_256:\033[1;32m", plaintext_hash, "\x1b[0m")
+    except:
+        print("Something went wrong during the hash process")
 
+    return 0
 
 # TEST ZONE
 if __name__ == "__main__":
-    # idea_main_encryption()
+    idea_main_encryption()
     idea_main_decryption()
 
     # During password (/key generation step) :

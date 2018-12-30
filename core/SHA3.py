@@ -1,3 +1,6 @@
+# -*-coding:UTF-8 -*
+# !/usr/bin/env python
+
 import sys
 from time import sleep
 import numpy as np
@@ -14,6 +17,12 @@ Works for different hash length:
 """
 
 
+#########################
+#                       #
+#       UTILITIES       #
+#                       #
+#########################
+
 def bloc(lgHash):
     """ bloc =r+c bits
     :param lgHash:
@@ -28,6 +37,7 @@ def bloc(lgHash):
     # print("c " + str(c))
 
     return r, c, tailleBloc
+
 
 
 def choixlgHash():
@@ -397,8 +407,14 @@ def string_to_array(string_hash):
 #########################
 
 def sha3_txt(txt, lgHash=256):
+    """ NOT WORKIN' (or at least not everytime)
+
+    :param txt: <str>(preferably) - some text
+    :param lgHash: <int> - hash length
+    :return: hexdigest: <str>
+    """
     r, c, block_len = bloc(lgHash)
-    binary_txt = bin(int.from_bytes(str.encode(txt, 'utf-8'), 'little'))[2:]
+    binary_txt = bin(int.from_bytes(str(txt).encode('utf-8'), 'little'))[2:]
     messagePadding = padding(binary_txt, r)
     HashBloc, HashString = hash(messagePadding, r)
     RecupHash = fonctionRecuperation(HashBloc, lgHash, r)
@@ -407,13 +423,33 @@ def sha3_txt(txt, lgHash=256):
     return hexdigest
 
 
-def sha3_file(filename, lgHash=256):
-    """ Sha3 with given parameters
+def sha3_int(integer, lgHash=256):
+    """ From int to sha3_XXX hexdigest
 
-    :param filename: <str>
-    :param lgHash: <int> hash length
-    :return: hexdigest <str> -
+    :param integer: <int>
+    :param lgHash: <int> - hash length
+    :return: hexdigest: <str>
     """
+    r, c, block_len = bloc(lgHash)
+    binary_txt = bin(integer)[2:]
+    messagePadding = padding(binary_txt, r)
+    HashBloc, HashString = hash(messagePadding, r)
+    RecupHash = fonctionRecuperation(HashBloc, lgHash, r)
+    hexdigest = hex(int(str(RecupHash), 2)).zfill(lgHash // 4)
+    # print("\033[1;32m[+]\x1b[0m", "Hash successfully generated")
+
+    return hexdigest
+
+
+def sha3_file(filename, lgHash=256):
+    """ Give the Sha3_XXX hexdigest of a file
+
+    :param filename: <str> - a filepath (or filename)
+    :param lgHash: <int> - hash length
+    :return: hexdigest: <str>
+    """
+    sys.stdout.flush()
+
     for i in tqdm(range(100), desc="Generating SHA3 Hash"):
         if i == 0:
             r, c, block_len = bloc(lgHash)
@@ -430,11 +466,12 @@ def sha3_file(filename, lgHash=256):
         sleep(0.01)
 
     sys.stdout.flush()
+
     return hexdigest
 
 
 def sha3_main():
-    """
+    """ Give the Sha3_XXX hexdigest of a file
     :return:
     """
     print("------Hashage sha-3----------")
@@ -455,17 +492,25 @@ def sha3_main():
     print("Hash-" + lgHash + "bits =>" + RecupHash)
     print("Taille de Hash = " + str(len(RecupHash)))
 
-
+# TEST ZONE
 if __name__ == '__main__':
     # sha3_main()
 
+    """    
     # ----------------
     # sha3_txt() TEST
     txt = "bonjour"
     plaintext_hash = sha3_txt(txt)
     print(plaintext_hash)
-
     """
+
+    # ----------------
+    # sha3_int() TEST
+    integer = 0x4781248c843906b0ce31ab07d62e968a6b7e8c17ecdfdd4b6b78aafbc13030cde610e0aea6ce35e1d39fbf8cc6fd98caee79f83f8fc1a04d7ef2db74e02ecaabd668385c9c8b4f62d9c1ad761601e040716494cad09cde8885bea8307a82032f037440cdc2976593d142eb70e83475839a3d089cbb0ed274b994e9c7d6b5c323
+    plaintext_hash = sha3_int(integer)
+    print(plaintext_hash)
+
+
     # ----------------
     # sha3_file() TEST
     file = "tests/idea_test.txt"
@@ -474,6 +519,6 @@ if __name__ == '__main__':
     expected_result = '0x2d852e36053c8f30d3635a53c286001e97643bd8397d0bfda82fbd946375f8bc'
     assert expected_result == plaintext_hash
     print("Hash:\033[1;32m", plaintext_hash, "\x1b[0m")
-    """
+
 
     pass
