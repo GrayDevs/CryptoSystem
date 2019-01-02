@@ -11,9 +11,9 @@
     <img src="https://badgen.net/badge/release/v0.1.0/blue">
     <img src="https://badgen.net/badge/Python/3.6 | 3.7/blue">
     <img src="https://badgen.net/badge/build/passing/green">
-</p>
-
+</br>
 The project consists in a python implementation multiple algorithm used in Secure Communication Protocol, from key generation, to authentication, key sharing and file encryption/decryption.
+</p>
 
 ## Getting Started
 
