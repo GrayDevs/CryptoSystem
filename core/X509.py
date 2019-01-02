@@ -7,6 +7,18 @@ import secrets
 
 from core.rsa import RSA
 
+""" Implementation of basics signature system based on the X509 standard
+
+* TODO *
+
+- Completing certificate Data (with issuer things, ...)
+- Actually use those Data (checking validity period, ...)
+- Implement PKI things such as:
+    - Saving Certficate Object
+    - Revoke lists
+    - etc...
+- Uses JSON (maybe)
+"""
 
 #########################
 #                       #
@@ -23,8 +35,8 @@ class Certificate(object):
         :param subject_public_key: [A, g, p (,Su)] <list>
         """
         self.subject_public_key = subject_public_key
-        self.data = {}
-        self.data_hash = ''
+        self.data = {}  # init
+        self.data_hash = ''  # init
         self.new_certificate()
         pass
 
@@ -121,6 +133,7 @@ def UTT_Signature(certificate):
     pass
 
 
+# TEST ZONE
 if __name__ == "__main__":
     """
     # Process Certificat :
