@@ -32,6 +32,8 @@ A step by step series of examples that tell you how to get a development env run
 git clone https://github.com/GrayDevs/CryptoSystem.git
 ```
 
+Get into the file, launch **main.py**, that's all.
+
 ## Built With
 
 * [Pycharm Edu](https://www.jetbrains.com/pycharm/) - The Python IDE used
