@@ -22,7 +22,9 @@ These instructions will get you a copy of the project up and running on your loc
 
 ### Prerequisites
 
+```
 @see setup.py
+```
 
 ### Installing
 
@@ -33,6 +35,32 @@ git clone https://github.com/GrayDevs/CryptoSystem.git
 ```
 
 Get into the directory, launch **main.py**, that's all.
+
+
+## Demo
+
+### Main menu
+![Main Menu](IMG_Demo/main_menu.PNG? "Main Menu")
+
+#### [1] Generating a public key using Diffie-Hellman
+![DH Public Key Generation](IMG_Demo/dh_public_key.PNG? "DH Public Key Generation")
+
+#### [2] Creating & signing a Certificate
+![Creating & signing a Certificate](IMG_Demo/creating_certificate.PNG? "Creating & signing a Certificate")
+
+#### [3] Authenticate a certificate
+![Authentication](IMG_Demo/authentication.PNG? "Authentication")
+
+#### [4] Share the key with Diffie-Hellman
+![Authentication](IMG_Demo/dh_final_key.PNG? "Authentication")
+
+#### [5] IDEA Encryption (256, CBC)
+![IDEA Encryption 1](IMG_Demo/idea_encryption_1.PNG? "Encryption 1")
+![IDEA Encryption 2](IMG_Demo/idea_encryption_2.PNG? "Encryption 2")
+
+#### [6] IDEA Decryption (256, CBC - of course -)
+![IDEA Decryption 1](IMG_Demo/idea_decryption_1.PNG? "Decryption 1")
+![IDEA Decryption 2](IMG_Demo/idea_decryption_2.PNG? "Decryption 2")
 
 ## Built With
 
