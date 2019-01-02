@@ -56,6 +56,7 @@ Get into the directory, launch **main.py**, that's all.
 #### [5] IDEA Encryption (256, CBC)
 ![IDEA Encryption 1](IMG_DEMO/idea_encryption_1.PNG? "Encryption 1")
 ![IDEA Encryption 2](IMG_DEMO/idea_encryption_2.PNG? "Encryption 2")
+![IDEA Encryption 3](IMG_DEMO/idea_encryption_3.PNG? "Encryption 3")
 
 #### [6] IDEA Decryption (256, CBC - of course -)
 ![IDEA Decryption 1](IMG_DEMO/idea_decryption_1.PNG? "Decryption 1")
