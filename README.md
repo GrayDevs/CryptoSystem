@@ -45,7 +45,7 @@ We probably shoud use [SemVer](http://semver.org/) for versioning.
 
 ## Authors
 
-* **me** - *Initial work* - [see Gray's github](https://github.com/GrayDevs/)
+* **me** - *Initial work* - [see me's github](https://github.com/GrayDevs/)
 * **Dimitri** - *Initial work* - [see Dimitri's github](https://www.youtube.com/watch?v=dQw4w9WgXcQ)
 
 See also the list of [contributors](https://github.com/your/project/contributors) who participated in this project.
