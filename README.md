@@ -6,7 +6,7 @@
 <h4 align="center"> GS15 Project - Secure Communication System </h4>
 
 <p align="center">
-    <img src=https://badgen.net/badge/Devs Status/on%20standby/grey)>
+    <img src=https://badgen.net/badge/Devs%20Status/on%20standby/grey)>
     <img src="https://badgen.net/badge/release/v0.1.0/blue">
     <img src="https://badgen.net/badge/Python/3.6 | 3.7/blue">
     <img src="https://badgen.net/badge/build/passing/green">
