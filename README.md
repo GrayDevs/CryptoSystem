@@ -1,5 +1,4 @@
 <h1 align="center">
-  <br>
   CryptoSystem
   <br>
 </h1>
@@ -14,7 +13,6 @@
   </br>
   </br>
 The project consists in a python implementation multiple algorithm used in Secure Communication Protocol, from key generation, to authentication, key sharing and file encryption/decryption.
-  <br>
 </p>
 
 ## Getting Started
